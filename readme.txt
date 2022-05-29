@@ -1,0 +1,3 @@
+-- Weapon cover tilt script
+-- Makes weapon go up when near obstacle to emulate weapon dimensions 
+-- Written by demonized

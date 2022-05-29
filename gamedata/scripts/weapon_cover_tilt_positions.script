@@ -1,0 +1,44 @@
+-- Table of weapon positions where a weapon will be tilted upon approaching cover
+-- How it works
+--   1. If weapon position is specified, use that, check exact section, weapon will be tilted there. Use if the gun is completely miss the mark during calculations and to speed up the process. Takes top priority
+--   2. If not 1, and If weapon offset is specified, use that, check exact section. Calculated position will be offseted by amount in the fields, useful if you need very small adjustments
+--   Offsets are work this way:
+--	    x = 0.1 - will move the gun right, -0.1 left
+--	    y = 0.1 - will move the gun up, -0.1 down
+--	    z = 0.1 - will move the gun front, -0.1 back
+-- You can extend those tables in separate scripts, look at how its done in patches for Blindsides and Firebreath weapons
+
+weapon_positions = {
+	-- Example positions, uncomment to make them work
+
+	-- ["wpn_vityaz"] = {
+	-- 	x = 0.10692,
+	-- 	y = -0.299683,
+	--  z = 0.330375,
+	-- },
+}
+
+weapon_offsets = {
+
+	["wpn_hk416"] = {
+		y = 0.2,
+	},
+	["wpn_ace21"] = {
+		y = 0.25,
+	},
+	["wpn_kriss"] = {
+		y = 0.1,
+		z = -0.1,
+	},
+	["wpn_grease"] = {
+		y = 0.2,
+	},
+	["wpn_cbj"] = {
+		y = 0.1,
+		z = -0.1,
+	},
+	["wpn_borz"] = {
+		y = 0.1,
+		z = 0.1,
+	},
+}
