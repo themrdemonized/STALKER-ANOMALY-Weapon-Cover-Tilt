@@ -1,0 +1,99 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+          
+      - name: Pull & update submodules recursively
+        run: |
+          git submodule update --init --recursive
+          git submodule update --recursive --remote --force
+          
+      - name: Commit & push changes
+        run: |
+          git config --global core.longpaths true
+          git config --global user.name ${{ secrets.USER_NAME }}
+          git config --global user.email ${{ secrets.USER_EMAIL }}
+          (git commit -am "Update submodules") || true
+          (git push) || true
+
+#       - name: Install artis dependencies and update
+#         id: arti_dep
+#         run: |
+#           cp -r anomaly-dependencies/speed/gamedata .
+#           git config --global core.longpaths true
+#           git config --global user.name ${{ secrets.USER_NAME }}
+#           git config --global user.email ${{ secrets.USER_EMAIL }}
+#           git add -A
+#           (git commit -am "Update arti dependencies") || true
+#           (git push) || true
+          
+      - name: Install demonized dependencies and update
+        id: dem_dem
+        run: |
+          cp -r anomaly-demonized-scripts/demonized_randomizing_functions/gamedata .    
+          git config --global core.longpaths true
+          git config --global user.name ${{ secrets.USER_NAME }}
+          git config --global user.email ${{ secrets.USER_EMAIL }}
+          git add -A
+          (git commit -am "Update demonized dependencies") || true
+          (git push) || true
+          
+      - name: Checkout submodules
+        run: |
+          git submodule update --init --recursive --remote
+      
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=today::$(date +'%Y.%m.%d')"
+
+      - name: Zip folder
+        run: |
+          MAIN=Weapon_Cover_Tilt_MAIN
+          BAS=Weapon_Cover_Tilt_PATCH_BaS
+          AR_PACK=Weapon_Cover_Tilt_PATCH_AR_Pack
+          BLIND=Weapon_Cover_Tilt_PATCH_Blindsides
+          FIRE=Weapon_Cover_Tilt_PATCH_PP19_AUG_L96_Reanim
+          SOUV=Weapon_Cover_Tilt_Souvlakis_FAL
+          mkdir Weapon_Cover_Tilt_MAIN
+          cp -R gamedata $MAIN
+          mkdir -p $BAS/gamedata/scripts; mv $MAIN/gamedata/scripts/weapon_cover_tilt_positions_bas.script $_
+          mkdir -p $AR_PACK/gamedata/scripts; mv $MAIN/gamedata/scripts/weapon_cover_tilt_positions_ar_pack.script $_
+          mkdir -p $BLIND/gamedata/scripts; mv $MAIN/gamedata/scripts/weapon_cover_tilt_positions_blindsides.script $_
+          mkdir -p $FIRE/gamedata/scripts; mv $MAIN/gamedata/scripts/weapon_cover_tilt_positions_firebreath.script $_
+          mkdir -p $SOUV/gamedata/scripts; mv $MAIN/gamedata/scripts/weapon_cover_tilt_positions_souvlakis.script $_
+          zip -r 'Weapon_Cover_Tilt.zip' readme.txt $MAIN $BAS $FIRE $SOUV $AR_PACK $BLIND
+        env: 
+          RELEASE_NAME_FULL: "Weapon_Cover_Tilt"
+      
+      - name: Publish
+        uses: "marvinpinto/action-automatic-releases@v1.2.1"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: ${{ github.event_name == 'push' && 'latest' || 'pre-release' }}
+          prerelease: ${{ github.event_name != 'push' }}
+          files: |
+            *.zip
