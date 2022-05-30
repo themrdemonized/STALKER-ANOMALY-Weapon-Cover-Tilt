@@ -190,21 +190,21 @@ if weapon_cover_tilt_positions then
 	o["wpn_remington700_mod_x_gen3"] = {
 		y = 0.2,
 	}
-	o["wpn_rpk74_16"] = {
-		y = 0.2,
-	}
-	o["wpn_saiga12s_isg"] = {
-		y = 0.2,
-	}
-	o["wpn_saiga12s_m1"] = {
-		y = 0.2,
-	}
-	o["wpn_saiga12s_m2"] = {
-		y = 0.2,
-	}
-	o["wpn_saiga20s"] = {
-		y = 0.2,
-	}
+	-- o["wpn_rpk74_16"] = {
+	-- 	y = 0.2,
+	-- }
+	-- o["wpn_saiga12s_isg"] = {
+	-- 	y = 0.2,
+	-- }
+	-- o["wpn_saiga12s_m1"] = {
+	-- 	y = 0.2,
+	-- }
+	-- o["wpn_saiga12s_m2"] = {
+	-- 	y = 0.2,
+	-- }
+	-- o["wpn_saiga20s"] = {
+	-- 	y = 0.2,
+	-- }
 	o["wpn_scar_siber"] = {
 		y = 0.2,
 	}
