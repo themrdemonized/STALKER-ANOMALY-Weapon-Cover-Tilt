@@ -17,16 +17,15 @@ end
 
 --EMA smoothing for changing values
 local default_smoothing = 12
-local alpha_table = {}
 local smoothed_values = {}
 
 local function ema(key, value, def, steps, delta)
 	local steps = steps or default_smoothing
 	local delta = delta or steps
-	if not alpha_table[steps] then alpha_table[steps] = 2.0 / (steps + 1) end
+	local smoothing_alpha = 2.0 / (steps + 1)
 
-	local smoothing_alpha = alpha_table[steps]
 	smoothed_values[key] = smoothed_values[key] and smoothed_values[key] + smoothing_alpha * (delta / steps) * (value - smoothed_values[key]) or def or value
+
 	--printf("EMA fired, key %s, target %s, current %s, going %s", key, value, smoothed_values[key], (value > smoothed_values[key] and "up" or "down"))
 	return smoothed_values[key]
 end
@@ -96,7 +95,7 @@ function reset_wpn_hud(sec)
 	hud_adjust.enabled(false)
 end
 
-local max_dist = 0.95
+local max_dist = 1.0
 local max_deg = 75
 local random_funcs = demonized_randomizing_functions
 local wpn_positions = weapon_cover_tilt_positions
@@ -175,8 +174,9 @@ function enable_tilt(sec, wpn)
 	end
 end
 
-function reset()
+function reset(sec)
 	if tilt_enabled then
+		if sec then reset_wpn_hud(sec) end
 		hud_adjust.enabled(false)
 		exec_console_cmd("g_firepos " .. (firepos_state or 0))
 		smoothed_values.hands_position_x = nil
@@ -197,7 +197,7 @@ function get_weapon_weight(wpn, sec)
 end
 
 function get_weapon_steps(wpn, sec)
-	return default_smoothing * (1 + get_weapon_weight(wpn, sec) * 0.085)
+	return default_smoothing * (1 + get_weapon_weight(wpn, sec) * 0.095)
 end
 
 function set_weapon_position(sec, new_pos, new_ori)
@@ -212,7 +212,7 @@ function set_weapon_position(sec, new_pos, new_ori)
 end
 
 function soft_reset(wpn, sec, delta)
-	if not weapon_table[sec] then return reset() end
+	if not weapon_table[sec] then return reset(sec) end
 
 	if tilt_enabled then
 		-- Increase speed of return to position when closer to it for zoomed weapons
@@ -255,177 +255,185 @@ function soft_reset(wpn, sec, delta)
 		end
 
 		-- printf("soft reset complete")
-		reset()
+		reset(sec)
 	end
 end
 
 function actor_on_update(binder, delta)
-	try(function()
-		local actor = db.actor
-		local wpn = actor:active_item()
+	local actor = db.actor
 
-		-- printf("%s", delta)
+	-- Cancel if PDA is active
+	if actor:active_slot() == 8 then
+		return reset()
+	end
 
-		-- Reset if no wpn
-		if not wpn then
-			return reset()
-		end
+	-- Cancel if detector is active
+	if actor:active_detector() then
+		return reset()
+	end
 
-		local sec = wpn:section()
-		local hud_sec = SYS_GetParam(0, sec, "hud")
+	local wpn = actor:active_item()
 
-		-- Reset when no hud sec
-		if not hud_sec then
-			return reset()
-		end
+	-- printf("%s", delta)
 
-		-- Reset if melee weapon
-		if IsMelee(wpn) or IsItem("fake_ammo_wpn", sec) then
-			return reset()
-		end
+	-- Reset if no wpn
+	if not wpn then
+		return reset()
+	end
 
-		-- Reset if throwable weapon (grenade, bolt)
-		if IsBolt(wpn) or IsGrenade(wpn) then
-			return reset()
-		end
+	local sec = wpn:section()
+	local hud_sec = SYS_GetParam(0, sec, "hud")
 
-		-- Add to weapon table
-		if not weapon_table[sec] then
-			add_to_weapon_table(sec)
-		end
+	-- Reset when no hud sec
+	if not hud_sec then
+		return reset(sec)
+	end
 
-		-- Soft reset if weapon is lowered
-		if game.actor_weapon_lowered() then
-			return soft_reset(wpn, sec, delta)
-		end
+	-- Reset if melee weapon
+	if IsMelee(wpn) or IsItem("fake_ammo_wpn", sec) then
+		return reset(sec)
+	end
 
-		-- Soft reset if hiding weapon or reloading
-		local state = wpn:get_state()
-		if state == 2 or state == 7 then
-			return soft_reset(wpn, sec, delta)
-		end
+	-- Reset if throwable weapon (grenade, bolt)
+	if IsBolt(wpn) or IsGrenade(wpn) then
+		return reset(sec)
+	end
 
-		-- Get target dist
-		local dist = math.max(0, level.get_target_dist() - 0.5)
+	-- Add to weapon table
+	if not weapon_table[sec] then
+		add_to_weapon_table(sec)
+	end
 
-		-- Get max dist based on weapon
-		local max_dist = SYS_GetParam(0, sec, "kind", "") == "w_pistol" and max_dist - 0.35 or max_dist
+	-- Soft reset if weapon is lowered
+	if game.actor_weapon_lowered() then
+		return soft_reset(wpn, sec, delta)
+	end
 
-		-- Soft reset if distance is more than max_dist
-		if dist > max_dist then
-			return soft_reset(wpn, sec, delta)
-		end
+	-- Soft reset if hiding weapon or reloading
+	local state = wpn:get_state()
+	if state == 2 or state == 7 then
+		return soft_reset(wpn, sec, delta)
+	end
 
-		-- Apply non linear coefficient
-		local coeff = random_funcs.CircularEaseOut(1 - dist / max_dist)
-		-- printf("coeff %s, dist %s, max_dist %s", coeff, dist, max_dist)
+	-- Get target dist
+	local dist = math.max(0, level.get_target_dist() - 0.5)
 
-		-- Calculate new position
-		local position_coeff_y = -0.445
-		local position_coeff_z = 0.485
+	-- Get max dist based on weapon
+	local max_dist = SYS_GetParam(0, sec, "kind", "") == "w_pistol" and max_dist - 0.35 or max_dist
 
-		-- Get steps depending on inv_weight, heavier guns have less movement speed
-		local steps = get_weapon_steps(wpn, sec)
-		
-		local new_pos
-		if wpn_positions.weapon_positions[sec] then
-			printf("using defined position")
-			local p = wpn_positions.weapon_positions[sec]
-			new_pos = {
-				[0] = lerp(weapon_table[sec].hands_position[0], p.x or weapon_table[sec].hands_position[0], coeff),
-				[1] = lerp(weapon_table[sec].hands_position[1], p.y or weapon_table[sec].hands_position[1], coeff),
-				[2] = lerp(weapon_table[sec].hands_position[2], p.z or weapon_table[sec].hands_position[2], coeff ^ 4),
-			}
-		else
-			-- Check for scopes on weapons
-			local sec = sec
-			if not wpn_positions.weapon_offsets[sec] then
-				local parent = SYS_GetParam(0, sec, "parent_section", sec)
-				local scopes = str_explode(SYS_GetParam(0, parent, "scopes", ""), ",")
-				for k, v in pairs(scopes) do
-					if (parent .. "_" .. v) == sec then
-						sec = parent
-						break
-					end
+	-- Soft reset if distance is more than max_dist
+	if dist > max_dist then
+		return soft_reset(wpn, sec, delta)
+	end
+
+	-- Apply non linear coefficient
+	local coeff = random_funcs.CircularEaseOut(1 - dist / max_dist)
+	-- printf("coeff %s, dist %s, max_dist %s", coeff, dist, max_dist)
+
+	-- Calculate new position
+	local position_coeff_y = -0.445
+	local position_coeff_z = 0.485
+
+	-- Get steps depending on inv_weight, heavier guns have less movement speed
+	local steps = get_weapon_steps(wpn, sec)
+	
+	local new_pos
+	if wpn_positions.weapon_positions[sec] then
+		local p = wpn_positions.weapon_positions[sec]
+		new_pos = {
+			[0] = lerp(weapon_table[sec].hands_position[0], p.x or weapon_table[sec].hands_position[0], coeff),
+			[1] = lerp(weapon_table[sec].hands_position[1], p.y or weapon_table[sec].hands_position[1], coeff),
+			[2] = lerp(weapon_table[sec].hands_position[2], p.z or weapon_table[sec].hands_position[2], coeff ^ 4),
+		}
+	else
+		-- Check for scopes on weapons
+		local base_sec = sec
+		if not wpn_positions.weapon_offsets[base_sec] then
+			local parent = SYS_GetParam(0, base_sec, "parent_section", base_sec)
+			local scopes = str_explode(SYS_GetParam(0, parent, "scopes", ""), ",")
+			for k, v in pairs(scopes) do
+				if (parent .. "_" .. v) == base_sec then
+					base_sec = parent
+					break
 				end
 			end
-
-			local o = {
-				[0] = wpn_positions.weapon_offsets[sec] and wpn_positions.weapon_offsets[sec].x or 0,
-				[1] = wpn_positions.weapon_offsets[sec] and wpn_positions.weapon_offsets[sec].y or 0,
-				[2] = wpn_positions.weapon_offsets[sec] and wpn_positions.weapon_offsets[sec].z or 0,
-			}
-
-			-- Interpolate between offseted position and desirable closer to obstacle, looks better, mostly
-			local is_pistol = SYS_GetParam(0, sec, "kind", "") == "w_pistol" and not not_pistol_sec[sec]
-			
-			-- Different calculations for pistols
-			if is_pistol then
-				local target_pos = target_pos.hands_position_pistol 
-
-				-- local a = {
-				-- 	[0] = weapon_table[sec].hands_position[0] + o[0] * coeff,
-				-- 	[1] = weapon_table[sec].hands_position[1] + (o[1] + position_coeff_y) * coeff,
-				-- 	[2] = weapon_table[sec].hands_position[2] + (o[2] + position_coeff_z) * coeff ^ 2,
-				-- }
-
-				local b = {
-					[0] = lerp(weapon_table[sec].hands_position[0], (o[0] + weapon_table[sec].hands_position[0]), coeff),
-					[1] = lerp(weapon_table[sec].hands_position[1], (o[1] + target_pos[1]), coeff ^ 0.8),
-					[2] = lerp(weapon_table[sec].hands_position[2], (o[2] + target_pos[2]), coeff ^ 2),
-				}
-
-				-- local c = {
-				-- 	[0] = lerp(b[0], b[0], coeff),
-				-- 	[1] = lerp(b[1], b[1], coeff),
-				-- 	[2] = lerp(b[2], b[2], coeff ^ 2),
-				-- }
-
-				new_pos = b
-			else
-				local target_pos = target_pos.hands_position_rifle
-
-				local a = {
-					[0] = weapon_table[sec].hands_position[0] + o[0] * coeff,
-					[1] = weapon_table[sec].hands_position[1] + (o[1] + position_coeff_y) * coeff,
-					[2] = weapon_table[sec].hands_position[2] + (o[2] + position_coeff_z) * coeff ^ 4,
-				}
-
-				local b = {
-					[0] = lerp(weapon_table[sec].hands_position[0], (o[0] + weapon_table[sec].hands_position[0]), coeff),
-					[1] = lerp(weapon_table[sec].hands_position[1], (o[1] + target_pos[1]), coeff),
-					[2] = lerp(weapon_table[sec].hands_position[2], (o[2] + target_pos[2]), coeff ^ 4),
-				}
-
-				local c = {
-					[0] = lerp(a[0], b[0], coeff),
-					[1] = lerp(a[1], b[1], coeff),
-					[2] = lerp(a[2], b[2], coeff ^ 4),
-				}
-
-				new_pos = c
-			end
 		end
 
-		-- Smooth new position
-		new_pos = {
-			[0] = ema("hands_position_x", new_pos[0], weapon_table[sec].hands_position[0], steps, delta),
-			[1] = ema("hands_position_y", new_pos[1], weapon_table[sec].hands_position[1], steps, delta),
-			[2] = ema("hands_position_z", new_pos[2], weapon_table[sec].hands_position[2], steps, delta),
+		local o = {
+			[0] = wpn_positions.weapon_offsets[base_sec] and wpn_positions.weapon_offsets[base_sec].x or 0,
+			[1] = wpn_positions.weapon_offsets[base_sec] and wpn_positions.weapon_offsets[base_sec].y or 0,
+			[2] = wpn_positions.weapon_offsets[base_sec] and wpn_positions.weapon_offsets[base_sec].z or 0,
 		}
 
-		local new_ori = {
-			[0] = weapon_table[sec].hands_orientation[0],
-			[1] = ema("hands_orientation_y", weapon_table[sec].hands_orientation[1] + max_deg * coeff, weapon_table[sec].hands_orientation[1], steps, delta),
-			[2] = weapon_table[sec].hands_orientation[2],
-		}
+		-- Interpolate between offseted position and desirable closer to obstacle, looks better, mostly
+		local is_pistol = SYS_GetParam(0, base_sec, "kind", "") == "w_pistol" and not not_pistol_sec[base_sec]
+		
+		-- Different calculations for pistols
+		if is_pistol then
+			local target_pos = target_pos.hands_position_pistol 
 
-		-- Adjust hud
-		enable_tilt(sec, wpn)
-		set_weapon_position(sec, new_pos, new_ori)
+			-- local a = {
+			-- 	[0] = weapon_table[sec].hands_position[0] + o[0] * coeff,
+			-- 	[1] = weapon_table[sec].hands_position[1] + (o[1] + position_coeff_y) * coeff,
+			-- 	[2] = weapon_table[sec].hands_position[2] + (o[2] + position_coeff_z) * coeff ^ 2,
+			-- }
 
-		-- printf("target_dist %s", dist)
-	end)
+			local b = {
+				[0] = lerp(weapon_table[sec].hands_position[0], (o[0] + weapon_table[sec].hands_position[0]), coeff),
+				[1] = lerp(weapon_table[sec].hands_position[1], (o[1] + target_pos[1]), coeff ^ 0.8),
+				[2] = lerp(weapon_table[sec].hands_position[2], (o[2] + target_pos[2]), coeff ^ 2),
+			}
+
+			-- local c = {
+			-- 	[0] = lerp(b[0], b[0], coeff),
+			-- 	[1] = lerp(b[1], b[1], coeff),
+			-- 	[2] = lerp(b[2], b[2], coeff ^ 2),
+			-- }
+
+			new_pos = b
+		else
+			local target_pos = target_pos.hands_position_rifle
+
+			local a = {
+				[0] = weapon_table[sec].hands_position[0] + o[0] * coeff,
+				[1] = weapon_table[sec].hands_position[1] + (o[1] + position_coeff_y) * coeff,
+				[2] = weapon_table[sec].hands_position[2] + (o[2] + position_coeff_z) * coeff ^ 4,
+			}
+
+			local b = {
+				[0] = lerp(weapon_table[sec].hands_position[0], (o[0] + weapon_table[sec].hands_position[0]), coeff),
+				[1] = lerp(weapon_table[sec].hands_position[1], (o[1] + target_pos[1]), coeff),
+				[2] = lerp(weapon_table[sec].hands_position[2], (o[2] + target_pos[2]), coeff ^ 4),
+			}
+
+			local c = {
+				[0] = lerp(a[0], b[0], coeff),
+				[1] = lerp(a[1], b[1], coeff),
+				[2] = lerp(a[2], b[2], coeff ^ 4),
+			}
+
+			new_pos = c
+		end
+	end
+
+	-- Smooth new position
+	new_pos = {
+		[0] = ema("hands_position_x", new_pos[0], weapon_table[sec].hands_position[0], steps, delta),
+		[1] = ema("hands_position_y", new_pos[1], weapon_table[sec].hands_position[1], steps, delta),
+		[2] = ema("hands_position_z", new_pos[2], weapon_table[sec].hands_position[2], steps, delta),
+	}
+
+	local new_ori = {
+		[0] = weapon_table[sec].hands_orientation[0],
+		[1] = ema("hands_orientation_y", weapon_table[sec].hands_orientation[1] + max_deg * coeff, weapon_table[sec].hands_orientation[1], steps, delta),
+		[2] = weapon_table[sec].hands_orientation[2],
+	}
+
+	-- Adjust hud
+	enable_tilt(sec, wpn)
+	set_weapon_position(sec, new_pos, new_ori)
+
+	-- printf("target_dist %s", dist)
 end
 
 function actor_on_first_update()
