@@ -16,7 +16,7 @@ local try = try or function(func, ...)
 end
 
 --EMA smoothing for changing values
-local default_smoothing = 12
+local default_smoothing = 13
 local smoothed_values = {}
 
 local function ema(key, value, def, steps, delta)
@@ -176,7 +176,7 @@ end
 
 function reset(sec)
 	if tilt_enabled then
-		if sec then reset_wpn_hud(sec) end
+		if sec and weapon_table[sec] then reset_wpn_hud(sec) end
 		hud_adjust.enabled(false)
 		exec_console_cmd("g_firepos " .. (firepos_state or 0))
 		smoothed_values.hands_position_x = nil
@@ -197,7 +197,7 @@ function get_weapon_weight(wpn, sec)
 end
 
 function get_weapon_steps(wpn, sec)
-	return default_smoothing * (1 + get_weapon_weight(wpn, sec) * 0.095)
+	return default_smoothing * (1 + get_weapon_weight(wpn, sec) * 0.09)
 end
 
 function set_weapon_position(sec, new_pos, new_ori)
@@ -267,11 +267,6 @@ function actor_on_update(binder, delta)
 		return reset()
 	end
 
-	-- Cancel if detector is active
-	if actor:active_detector() then
-		return reset()
-	end
-
 	local wpn = actor:active_item()
 
 	-- printf("%s", delta)
@@ -309,6 +304,11 @@ function actor_on_update(binder, delta)
 		return soft_reset(wpn, sec, delta)
 	end
 
+	-- Cancel if detector is active
+	if actor:active_detector() then
+		return soft_reset(wpn, sec, delta)
+	end
+
 	-- Soft reset if hiding weapon or reloading
 	local state = wpn:get_state()
 	if state == 2 or state == 7 then
@@ -324,6 +324,16 @@ function actor_on_update(binder, delta)
 	-- Soft reset if distance is more than max_dist
 	if dist > max_dist then
 		return soft_reset(wpn, sec, delta)
+	end
+
+	-- Soft reset if target is enemy stalker or monster
+	local target_obj = level.get_target_obj()
+	if target_obj then
+		if IsMonster(target_obj) then
+			return soft_reset(wpn, sec, delta)
+		elseif IsStalker(target_obj) and xr_combat_ignore.is_enemy(actor, target_obj, true) then
+			return soft_reset(wpn, sec, delta)
+		end
 	end
 
 	-- Apply non linear coefficient
