@@ -100,7 +100,7 @@ function reset_wpn_hud(sec)
 	hud_adjust.enabled(false)
 end
 
-local max_dist = 1.0
+local max_dist = 0.85
 local max_deg = 75
 local random_funcs = demonized_randomizing_functions
 local wpn_positions = weapon_cover_tilt_positions
@@ -202,7 +202,7 @@ function get_weapon_weight(wpn, sec)
 end
 
 function get_weapon_steps(wpn, sec)
-	return default_smoothing * (1 + get_weapon_weight(wpn, sec) * 0.085)
+	return default_smoothing * (1 + get_weapon_weight(wpn, sec) * 0.08)
 end
 
 function set_weapon_position(sec, new_pos, new_ori)
@@ -339,7 +339,7 @@ function actor_on_update(binder, delta)
 	local dist = math.max(0, level.get_target_dist() - 0.5)
 
 	-- Get max dist based on weapon
-	local max_dist = SYS_GetParam(0, sec, "kind", "") == "w_pistol" and max_dist - 0.4 or max_dist
+	local max_dist = SYS_GetParam(0, sec, "kind", "") == "w_pistol" and max_dist - 0.3 or max_dist
 
 	-- Soft reset if distance is more than max_dist
 	if dist > max_dist then
