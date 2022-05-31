@@ -47,13 +47,13 @@ if weapon_cover_tilt_positions then
 		y = 0.2,
 	}
 	o["wpn_ak5c_bas"] = {
-		y = 0.2,
+		y = 0.3,
 	}
 	o["wpn_ak5c_bas_5c_tik"] = {
 		y = 0.3,
 	}
 	o["wpn_ak5c_isg"] = {
-		y = 0.25,
+		y = 0.3,
 	}
 	o["wpn_ak74_isg"] = {
 		y = 0.2,
@@ -193,9 +193,10 @@ if weapon_cover_tilt_positions then
 	-- o["wpn_remington700_mod_x_gen3"] = {
 	-- 	y = 0.2,
 	-- }
-	-- o["wpn_rpk74_16"] = {
-	-- 	y = 0.2,
-	-- }
+	o["wpn_rpk74_16"] = {
+		y = -0.1,
+		z = -0.15,
+	}
 	-- o["wpn_saiga12s_isg"] = {
 	-- 	y = 0.2,
 	-- }
