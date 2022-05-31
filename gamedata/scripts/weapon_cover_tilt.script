@@ -16,8 +16,8 @@ local try = try or function(func, ...)
 end
 
 --EMA smoothing for changing values
-local default_smoothing = 11
-local coeff_smoothing = 7
+local default_smoothing = 12
+local coeff_smoothing = 6
 local smoothed_values = {}
 
 local function ema(key, value, def, steps, delta)
