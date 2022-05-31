@@ -38,6 +38,11 @@ local function lerp(a, b, f)
 	end
 end
 
+function IsBinoc(sec)
+	return 	SYS_GetParam(0, sec, "ammo_class", "") == "ammo_binoc"
+	or 		SYS_GetParam(0, sec, "class", "") == "WP_BINOC"
+end
+
 local parameters = {
 -- Type: 0 = string | 1 = number | 2 = 3d vector | 3 = 4d vector | 
 	["hands_position"]		            = { name = "Hands Position",         typ = 2, def = {0,0,0}, indx = 1,  min = -180,   max = 180, step = 0.00001, idxa = 0, idxb = 0,  hud = true },
@@ -288,8 +293,8 @@ function actor_on_update(binder, delta)
 		return reset(sec)
 	end
 
-	-- Reset if melee weapon
-	if IsMelee(wpn) or IsItem("fake_ammo_wpn", sec) then
+	-- Reset if melee weapon or binocs
+	if IsMelee(wpn) or IsItem("fake_ammo_wpn", sec) or IsBinoc(sec) then
 		return reset(sec)
 	end
 
