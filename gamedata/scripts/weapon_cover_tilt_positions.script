@@ -26,6 +26,37 @@ weapon_offsets = {
 	["wpn_ace21"] = {
 		y = 0.25,
 	},
+	["wpn_svd"] = {
+		y = 0.15,
+	},
+	["wpn_svd_custom"] = {
+		y = 0.15,
+	},
+	["wpn_svd_nimble"] = {
+		y = 0.15,
+	},
+	["wpn_mp5"] = {
+		y = 0.2,
+	},
+	["wpn_mp5_custom"] = {
+		y = 0.2,
+	},
+	["wpn_mp5_nimble"] = {
+		y = 0.2,
+	},
+	["wpn_p90"] = {
+		y = 0.15,
+		z = 0.1,
+	},
+	["wpn_sig552"] = {
+		z = 0.1,
+	},
+	["wpn_pp2000"] = {
+		x = -0.02,
+		y = 0.11,
+		z = 0.1,
+	},
+
 	["wpn_kriss"] = {
 		y = 0.1,
 		z = -0.1,
@@ -40,5 +71,20 @@ weapon_offsets = {
 	["wpn_borz"] = {
 		y = 0.1,
 		z = 0.1,
+	},
+	["wpn_ksvk"] = {
+		y = 0.15,
+	},
+	["wpn_sig552_tactical"] = {
+		y = 0.25,
+		z = 0.05,
+	},
+	["wpn_aek919k"] = {
+		y = 0.14,
+		z = 0.05,
+	},
+	["wpn_mp9"] = {
+		y = 0.1,
+		z = 0.07,
 	},
 }

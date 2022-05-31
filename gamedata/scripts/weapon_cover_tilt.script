@@ -16,7 +16,7 @@ local try = try or function(func, ...)
 end
 
 --EMA smoothing for changing values
-local default_smoothing = 13
+local default_smoothing = 12
 local smoothed_values = {}
 
 local function ema(key, value, def, steps, delta)
@@ -215,10 +215,13 @@ function soft_reset(wpn, sec, delta)
 	if not weapon_table[sec] then return reset(sec) end
 
 	if tilt_enabled then
+		-- k is modifier for ema steps to have more inertia in the beginning of movement
+		local k = math.max(1, 1.5 - (1 - normalize(smoothed_values.hands_orientation_y or max_deg, weapon_table[sec].hands_orientation[1], max_deg)))
+
 		-- Increase speed of return to position when closer to it for zoomed weapons
 		local cobj = wpn:cast_Weapon()
 		local is_scoped = cobj and cobj:IsScopeAttached()
-		local k = is_scoped and normalize(smoothed_values.hands_orientation_y, weapon_table[sec].hands_orientation[1], max_deg) ^ 0.12 or 1
+		k = k * (is_scoped and normalize(smoothed_values.hands_orientation_y, weapon_table[sec].hands_orientation[1], max_deg) ^ 0.11 or 1)
 
 		-- printf("cur %s, min %s, max %s, %s", smoothed_values.hands_orientation_y, weapon_table[sec].hands_orientation[1], max_deg, k)
 		local steps = get_weapon_steps(wpn, sec) * k
@@ -259,6 +262,7 @@ function soft_reset(wpn, sec, delta)
 	end
 end
 
+local reset_on_show_done = false
 function actor_on_update(binder, delta)
 	local actor = db.actor
 
@@ -299,6 +303,18 @@ function actor_on_update(binder, delta)
 		add_to_weapon_table(sec)
 	end
 
+	-- Reset HUD once on weapon raise
+	local state = wpn:get_state()
+	if state == 1 then
+		if not reset_on_show_done then
+			-- printf("reset on show for %s", sec)
+			reset_on_show_done = true
+			reset(sec)
+		end
+	else
+		reset_on_show_done = false
+	end
+
 	-- Soft reset if weapon is lowered
 	if game.actor_weapon_lowered() then
 		return soft_reset(wpn, sec, delta)
@@ -310,7 +326,6 @@ function actor_on_update(binder, delta)
 	end
 
 	-- Soft reset if hiding weapon or reloading
-	local state = wpn:get_state()
 	if state == 2 or state == 7 then
 		return soft_reset(wpn, sec, delta)
 	end
@@ -319,7 +334,7 @@ function actor_on_update(binder, delta)
 	local dist = math.max(0, level.get_target_dist() - 0.5)
 
 	-- Get max dist based on weapon
-	local max_dist = SYS_GetParam(0, sec, "kind", "") == "w_pistol" and max_dist - 0.35 or max_dist
+	local max_dist = SYS_GetParam(0, sec, "kind", "") == "w_pistol" and max_dist - 0.4 or max_dist
 
 	-- Soft reset if distance is more than max_dist
 	if dist > max_dist then
@@ -345,7 +360,9 @@ function actor_on_update(binder, delta)
 	local position_coeff_z = 0.485
 
 	-- Get steps depending on inv_weight, heavier guns have less movement speed
-	local steps = get_weapon_steps(wpn, sec)
+	-- k is modifier for ema steps to have more inertia in the beginning of movement
+	local k = math.max(1, 1.5 - math.sqrt(normalize(smoothed_values.hands_orientation_y or weapon_table[sec].hands_orientation[1], weapon_table[sec].hands_orientation[1], max_deg)))
+	local steps = get_weapon_steps(wpn, sec) * k
 	
 	local new_pos
 	if wpn_positions.weapon_positions[sec] then
@@ -451,10 +468,15 @@ function actor_on_first_update()
 	firepos_state = 0
 end
 
+-- Reset without parameter, for callbacks
+function reset_func()
+	reset()
+end
+
 function on_game_start()
-	RegisterScriptCallback("actor_on_before_death", reset)
-	RegisterScriptCallback("actor_on_net_destroy", reset)
-	RegisterScriptCallback("on_before_level_changing", reset)
+	RegisterScriptCallback("actor_on_before_death", reset_func)
+	RegisterScriptCallback("actor_on_net_destroy", reset_func)
+	RegisterScriptCallback("on_before_level_changing", reset_func)
 	RegisterScriptCallback("actor_on_first_update", actor_on_first_update)
 	RegisterScriptCallback("actor_on_update", actor_on_update)
 end

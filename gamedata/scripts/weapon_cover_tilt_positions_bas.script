@@ -1,3 +1,6 @@
+-- Extension script for weapon_cover_tilt_positions.script file
+-- Open weapon_cover_tilt_positions.script file for instructions
+
 if weapon_cover_tilt_positions then
 
 	if not weapon_cover_tilt_positions.weapon_offsets then
@@ -175,21 +178,21 @@ if weapon_cover_tilt_positions then
 	o["wpn_mp153_m1"] = {
 		y = 0.2,
 	}
-	o["wpn_remington700"] = {
-		y = 0.2,
-	}
-	o["wpn_remington700_archangel"] = {
-		y = 0.2,
-	}
-	o["wpn_remington700_lapua700"] = {
-		y = 0.2,
-	}
-	o["wpn_remington700_magpul_pro"] = {
-		y = 0.2,
-	}
-	o["wpn_remington700_mod_x_gen3"] = {
-		y = 0.2,
-	}
+	-- o["wpn_remington700"] = {
+	-- 	y = 0.2,
+	-- }
+	-- o["wpn_remington700_archangel"] = {
+	-- 	y = 0.2,
+	-- }
+	-- o["wpn_remington700_lapua700"] = {
+	-- 	y = 0.2,
+	-- }
+	-- o["wpn_remington700_magpul_pro"] = {
+	-- 	y = 0.2,
+	-- }
+	-- o["wpn_remington700_mod_x_gen3"] = {
+	-- 	y = 0.2,
+	-- }
 	-- o["wpn_rpk74_16"] = {
 	-- 	y = 0.2,
 	-- }
@@ -224,55 +227,58 @@ if weapon_cover_tilt_positions then
 		y = 0.2,
 	}
 	
-	o["wpn_sks_b"] = {
-		y = 0.2,
-	}
-	o["wpn_sks_molot"] = {
-		y = 0.2,
-	}
-	o["wpn_sks_tac"] = {
-		y = 0.2,
-	}
-	o["wpn_sr1m"] = {
-		y = 0.2,
-	}
+	-- o["wpn_sks_b"] = {
+	-- 	y = 0.2,
+	-- }
+	-- o["wpn_sks_molot"] = {
+	-- 	y = 0.2,
+	-- }
+	-- o["wpn_sks_tac"] = {
+	-- 	y = 0.2,
+	-- }
+	-- o["wpn_sr1m"] = {
+	-- 	y = 0.2,
+	-- }
 	o["wpn_sr2_m1"] = {
-		y = 0.2,
+		y = 0.1,
 	}
 	o["wpn_sr2_veresk"] = {
-		y = 0.2,
+		y = 0.1,
+	}
+	o["wpn_sr2_veresk_sr2_upkit"] = {
+		y = 0.1,
 	}
 	o["wpn_svd_m1"] = {
-		y = 0.2,
+		y = -0.05,
 	}
 	o["wpn_svds"] = {
-		y = 0.2,
+		y = -0.05,
 	}
 	o["wpn_svds_pmc"] = {
-		y = 0.2,
+		y = -0.05,
 	}
-	o["wpn_toz106"] = {
-		y = 0.2,
-	}
-	o["wpn_toz106_m1"] = {
-		y = 0.2,
-	}
+	-- o["wpn_toz106"] = {
+	-- 	y = 0.2,
+	-- }
+	-- o["wpn_toz106_m1"] = {
+	-- 	y = 0.2,
+	-- }
 	
-	o["wpn_val_tac"] = {
-		y = 0.2,
-	}
+	-- o["wpn_val_tac"] = {
+	-- 	y = 0.2,
+	-- }
 	o["wpn_vintorez_isg"] = {
-		y = 0.2,
+		y = 0.14,
 	}
-	o["wpn_vintorez_m1"] = {
-		y = 0.2,
-	}
-	o["wpn_vintorez_m2"] = {
-		y = 0.2,
-	}
-	o["wpn_vintorez_n1"] = {
-		y = 0.2,
-	}
+	-- o["wpn_vintorez_m1"] = {
+	-- 	y = 0.2,
+	-- }
+	-- o["wpn_vintorez_m2"] = {
+	-- 	y = 0.2,
+	-- }
+	-- o["wpn_vintorez_n1"] = {
+	-- 	y = 0.2,
+	-- }
 
 	-- Pistols
 	o["wpn_aps_bas"] = {
@@ -297,11 +303,11 @@ if weapon_cover_tilt_positions then
 	-- }
 	o["wpn_korth"] = {
 		y = 0.25,
-		z = -0.13,
+		z = -0.16,
 	}
 	o["wpn_korth_custom"] = {
 		y = 0.25,
-		z = -0.13,
+		z = -0.16,
 	}
 	-- o["wpn_sig220_n"] = {
 	-- 	y = 0.2,
@@ -318,24 +324,30 @@ if weapon_cover_tilt_positions then
 	-- o["wpn_pb_bas_custom"] = {
 	-- 	y = 0.2,
 	-- }
-	-- o["wpn_pl15"] = {
-	-- 	y = 0.2,
-	-- }
-	-- o["wpn_pl15_lazup_pl15"] = {
-	-- 	y = 0.2,
-	-- }
-	-- o["wpn_pl15_pl15_scolaz"] = {
-	-- 	y = 0.2,
-	-- }
-	-- o["wpn_pl15_tan"] = {
-	-- 	y = 0.2,
-	-- }
-	-- o["wpn_pl15_tan_lazup_pl15"] = {
-	-- 	y = 0.2,
-	-- }
-	-- o["wpn_pl15_tan_pl15_scolaz"] = {
-	-- 	y = 0.2,
-	-- }
+	o["wpn_pl15"] = {
+		y = 0.2,
+		z = -0.1,
+	}
+	o["wpn_pl15_lazup_pl15"] = {
+		y = 0.2,
+		z = -0.1,
+	}
+	o["wpn_pl15_pl15_scolaz"] = {
+		y = 0.2,
+		z = -0.1,
+	}
+	o["wpn_pl15_tan"] = {
+		y = 0.2,
+		z = -0.1,
+	}
+	o["wpn_pl15_tan_lazup_pl15"] = {
+		y = 0.2,
+		z = -0.1,
+	}
+	o["wpn_pl15_tan_pl15_scolaz"] = {
+		y = 0.2,
+		z = -0.1,
+	}
 	-- o["wpn_pm_bas"] = {
 	-- 	y = 0.2,
 	-- }
@@ -351,4 +363,18 @@ if weapon_cover_tilt_positions then
 	-- o["wpn_walther_p99"] = {
 	-- 	y = 0.2,
 	-- }
+
+	function on_game_start()
+		-- If blindsides patch enabled - disable their positions
+		if weapon_cover_tilt_positions_blindsides then
+			o["wpn_pb"] = {
+				y = 0,
+				z = 0,
+			}
+			o["wpn_pb_custom"] = {
+				y = 0,
+				z = 0,
+			}
+		end
+	end
 end

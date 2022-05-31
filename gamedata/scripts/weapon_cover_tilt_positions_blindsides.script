@@ -1,3 +1,6 @@
+-- Extension script for weapon_cover_tilt_positions.script file
+-- Open weapon_cover_tilt_positions.script file for instructions
+
 if weapon_cover_tilt_positions then
 
 	if not weapon_cover_tilt_positions.weapon_offsets then
@@ -136,9 +139,6 @@ if weapon_cover_tilt_positions then
 	o["wpn_rpk74"] = {
 		y = 0.2,
 	}
-	o["wpn_saiga12s"] = {
-		y = 0.2,
-	}
 	o["wpn_sks"] = {
 		y = 0.1,
 	}
@@ -150,9 +150,6 @@ if weapon_cover_tilt_positions then
 	}
 	o["wpn_svt40_modern"] = {
 		y = 0.1,
-	}
-	o["wpn_vepr"] = {
-		y = 0.2,
 	}
 
 	-- Shotties
@@ -204,23 +201,33 @@ if weapon_cover_tilt_positions then
 	-- o["wpn_wincheaster1300_trapper"] = {
 	-- 	y = 0.2,
 	-- }
+	o["wpn_saiga12s"] = {
+		y = 0.1,
+	}
+	o["wpn_vepr"] = {
+		y = 0.1,
+	}
 
 	-- SMG, unused
 	-- o["wpn_kiparis"] = {
 	-- 	y = 0.2,
 	-- }
-	-- o["wpn_vz61"] = {
-	-- 	y = 0.2,
-	-- }
-	-- o["wpn_vz61_alt"] = {
-	-- 	y = 0.2,
-	-- }
-	-- o["wpn_vz61_camo"] = {
-	-- 	y = 0.2,
-	-- }
-	-- o["wpn_vz61_freedom"] = {
-	-- 	y = 0.2,
-	-- }
+	o["wpn_vz61"] = {
+		y = 0.05,
+		z = 0.05,
+	}
+	o["wpn_vz61_alt"] = {
+		y = 0.05,
+		z = 0.05,
+	}
+	o["wpn_vz61_camo"] = {
+		y = 0.05,
+		z = 0.05,
+	}
+	o["wpn_vz61_freedom"] = {
+		y = 0.05,
+		z = 0.05,
+	}
 
 	--Pistols
 	o["wpn_aps"] = {
@@ -244,7 +251,7 @@ if weapon_cover_tilt_positions then
 		z = -0.1,
 	}
 	o["wpn_pb"] = {
-		y = 0,
+		y = 0.2,
 		z = -0.1,
 	}
 	o["wpn_pb_custom"] = {
