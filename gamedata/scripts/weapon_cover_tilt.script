@@ -16,7 +16,8 @@ local try = try or function(func, ...)
 end
 
 --EMA smoothing for changing values
-local default_smoothing = 12
+local default_smoothing = 11
+local coeff_smoothing = 7
 local smoothed_values = {}
 
 local function ema(key, value, def, steps, delta)
@@ -190,6 +191,7 @@ function reset(sec)
 		smoothed_values.hands_orientation_x = nil
 		smoothed_values.hands_orientation_y = nil
 		smoothed_values.hands_orientation_z = nil
+		smoothed_values.coeff = nil
 		tilt_enabled = false
 	end
 end
@@ -231,15 +233,19 @@ function soft_reset(wpn, sec, delta)
 		-- printf("cur %s, min %s, max %s, %s", smoothed_values.hands_orientation_y, weapon_table[sec].hands_orientation[1], max_deg, k)
 		local steps = get_weapon_steps(wpn, sec) * k
 
+		-- Smooth the coeff also
+		local coeff_smoothing = coeff_smoothing * 2
+		local coeff = ema("coeff", 0, 0, coeff_smoothing, delta)
+
 		local new_pos = {
-			[0] = ema("hands_position_x", weapon_table[sec].hands_position[0], weapon_table[sec].hands_position[0], steps, delta),
-			[1] = ema("hands_position_y", weapon_table[sec].hands_position[1], weapon_table[sec].hands_position[1], steps, delta),
-			[2] = ema("hands_position_z", weapon_table[sec].hands_position[2], weapon_table[sec].hands_position[2], steps, delta),
+			[0] = ema("hands_position_x", lerp(weapon_table[sec].hands_position[0], smoothed_values.hands_position_x, coeff), weapon_table[sec].hands_position[0], steps, delta),
+			[1] = ema("hands_position_y", lerp(weapon_table[sec].hands_position[1], smoothed_values.hands_position_y, coeff), weapon_table[sec].hands_position[1], steps, delta),
+			[2] = ema("hands_position_z", lerp(weapon_table[sec].hands_position[2], smoothed_values.hands_position_z, coeff), weapon_table[sec].hands_position[2], steps, delta),
 		}
 
 		local new_ori = {
 			[0] = weapon_table[sec].hands_orientation[0],
-			[1] = ema("hands_orientation_y", weapon_table[sec].hands_orientation[1], weapon_table[sec].hands_orientation[1], steps, delta),
+			[1] = ema("hands_orientation_y", lerp(weapon_table[sec].hands_orientation[1], smoothed_values.hands_orientation_y, coeff), weapon_table[sec].hands_orientation[1], steps, delta),
 			[2] = weapon_table[sec].hands_orientation[2],
 		}
 
@@ -358,6 +364,9 @@ function actor_on_update(binder, delta)
 
 	-- Apply non linear coefficient
 	local coeff = random_funcs.CircularEaseOut(1 - dist / max_dist)
+
+	-- Smooth the coeff also
+	coeff = ema("coeff", coeff, 0, coeff_smoothing, delta)
 	-- printf("coeff %s, dist %s, max_dist %s", coeff, dist, max_dist)
 
 	-- Calculate new position
