@@ -255,8 +255,8 @@ function soft_reset(wpn, sec, delta)
 		end
 
 		for i = 0, 2, 1 do
-			if 	math.abs(new_pos[i] - weapon_table[sec].hands_position[i]) > 0.06
-			or 	math.abs(new_ori[i] - weapon_table[sec].hands_orientation[i]) > 0.06
+			if 	math.abs(new_pos[i] - weapon_table[sec].hands_position[i]) > 0.055
+			or 	math.abs(new_ori[i] - weapon_table[sec].hands_orientation[i]) > 0.055
 			then
 				return
 			end
