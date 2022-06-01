@@ -114,7 +114,7 @@ function reset_wpn_hud(sec)
 	hud_adjust.enabled(false)
 end
 
-local max_dist = 0.85
+local max_dist = 0.8
 local max_deg = 75
 local random_funcs = demonized_randomizing_functions
 local wpn_positions = weapon_cover_tilt_positions
@@ -357,7 +357,7 @@ function actor_on_update(binder, delta)
 	local dist = max(0, get_target_dist() - 0.5)
 
 	-- Get max dist based on weapon
-	local max_dist = SYS_GetParam(0, sec, "kind", "") == "w_pistol" and max_dist - 0.3 or max_dist
+	local max_dist = SYS_GetParam(0, sec, "kind", "") == "w_pistol" and max_dist - 0.34 or max_dist
 
 	-- Soft reset if distance is more than max_dist
 	if dist > max_dist then
