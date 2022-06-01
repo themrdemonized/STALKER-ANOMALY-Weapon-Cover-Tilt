@@ -51,6 +51,10 @@ local function lerp(a, b, f)
 	end
 end
 
+function debug_enabled()
+	return DEV_DEBUG or DEV_DEBUG_DEV
+end
+
 function IsBinoc(sec)
 	return 	SYS_GetParam(0, sec, "ammo_class", "") == "ammo_binoc"
 	or 		SYS_GetParam(0, sec, "class", "") == "WP_BINOC"
@@ -187,7 +191,11 @@ function enable_tilt(sec, wpn)
 
 		hud_adjust.enabled(true)
 		set_weapon_position(sec, weapon_table[sec].hands_position, weapon_table[sec].hands_orientation)
-		exec_console_cmd("g_firepos 1")
+		
+		if debug_enabled() then
+			exec_console_cmd("g_firepos 1")
+		end
+		
 		tilt_enabled = true
 	end
 end
@@ -196,7 +204,11 @@ function reset(sec)
 	if tilt_enabled then
 		if sec and weapon_table[sec] then reset_wpn_hud(sec) end
 		hud_adjust.enabled(false)
-		exec_console_cmd("g_firepos " .. (firepos_state or 0))
+		
+		if debug_enabled() then
+			exec_console_cmd("g_firepos " .. (firepos_state or 0))
+		end
+		
 		smoothed_values.hands_position_x = nil
 		smoothed_values.hands_position_y = nil
 		smoothed_values.hands_position_z = nil
@@ -492,7 +504,7 @@ function actor_on_update(binder, delta)
 end
 
 function actor_on_first_update()
-	-- firepos_state = get_console_cmd(0, "g_firepos")
+	-- firepos_state = debug_enabled() and get_console_cmd(0, "g_firepos") or 0
 	firepos_state = 0
 end
 
