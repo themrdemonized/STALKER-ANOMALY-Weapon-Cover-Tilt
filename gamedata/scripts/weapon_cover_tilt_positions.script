@@ -58,8 +58,11 @@ weapon_offsets = {
 	},
 
 	["wpn_kriss"] = {
-		y = 0.1,
-		z = -0.1,
+		y = 0.15,
+		z = 0.15,
+	},
+	["wpn_kriss_custom"] = {
+		z = 0.2,
 	},
 	["wpn_grease"] = {
 		y = 0.2,
