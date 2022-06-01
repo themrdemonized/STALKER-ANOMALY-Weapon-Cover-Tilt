@@ -247,7 +247,6 @@ function soft_reset(wpn, sec, delta)
 		local steps = get_weapon_steps(wpn, sec) * k
 
 		-- Smooth the coeff also
-		local coeff_smoothing = coeff_smoothing * 2
 		local coeff = ema("coeff", 0, 0, coeff_smoothing, delta)
 
 		local new_pos = {
