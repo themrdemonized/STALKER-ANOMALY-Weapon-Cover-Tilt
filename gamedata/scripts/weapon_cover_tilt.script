@@ -28,9 +28,8 @@ local actor_weapon_lowered = game.actor_weapon_lowered
 local get_target_dist = level.get_target_dist
 local get_target_obj = level.get_target_obj
 
---EMA smoothing for changing values
+--EMA smoothing for changing values, frame independent
 local default_smoothing = 11.5
-local coeff_smoothing = 7
 local smoothed_values = {}
 
 local function ema(key, value, def, steps, delta)
@@ -217,7 +216,7 @@ function get_weapon_weight(wpn, sec)
 end
 
 function get_weapon_steps(wpn, sec)
-	return default_smoothing * (1 + get_weapon_weight(wpn, sec) * 0.08)
+	return default_smoothing * (1 + get_weapon_weight(wpn, sec) * 0.07)
 end
 
 function set_weapon_position(sec, new_pos, new_ori)
@@ -246,7 +245,8 @@ function soft_reset(wpn, sec, delta)
 		-- printf("cur %s, min %s, max %s, %s", smoothed_values.hands_orientation_y, weapon_table[sec].hands_orientation[1], max_deg, k)
 		local steps = get_weapon_steps(wpn, sec) * k
 
-		-- Smooth the coeff also
+		-- Smooth the coeff
+		local coeff_smoothing = steps * 0.5
 		local coeff = ema("coeff", 0, 0, coeff_smoothing, delta)
 
 		local new_pos = {
@@ -374,11 +374,6 @@ function actor_on_update(binder, delta)
 		end
 	end
 
-	-- Apply non linear coefficient
-	local coeff = random_funcs.CircularEaseOut(1 - dist / max_dist)
-
-	-- Smooth the coeff also
-	coeff = ema("coeff", coeff, 0, coeff_smoothing, delta)
 	-- printf("coeff %s, dist %s, max_dist %s", coeff, dist, max_dist)
 
 	-- Calculate new position
@@ -389,6 +384,13 @@ function actor_on_update(binder, delta)
 	-- k is modifier for ema steps to have more inertia in the beginning of movement
 	local k = max(1, 1.5 - sqrt(normalize(smoothed_values.hands_orientation_y or weapon_table[sec].hands_orientation[1], weapon_table[sec].hands_orientation[1], max_deg)))
 	local steps = get_weapon_steps(wpn, sec) * k
+
+	-- Apply non linear coefficient
+	local coeff = random_funcs.CircularEaseOut(1 - dist / max_dist)
+
+	-- Smooth the coeff
+	local coeff_smoothing = steps * 0.5
+	coeff = ema("coeff", coeff, 0, coeff_smoothing, delta)
 	
 	local new_pos
 	if wpn_positions.weapon_positions[sec] then
