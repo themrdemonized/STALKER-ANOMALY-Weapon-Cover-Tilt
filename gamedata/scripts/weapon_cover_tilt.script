@@ -195,7 +195,7 @@ function enable_tilt(sec, wpn)
 		if debug_enabled() then
 			exec_console_cmd("g_firepos 1")
 		end
-		
+
 		tilt_enabled = true
 	end
 end
@@ -208,7 +208,7 @@ function reset(sec)
 		if debug_enabled() then
 			exec_console_cmd("g_firepos " .. (firepos_state or 0))
 		end
-		
+
 		smoothed_values.hands_position_x = nil
 		smoothed_values.hands_position_y = nil
 		smoothed_values.hands_position_z = nil
@@ -367,6 +367,7 @@ function actor_on_update(binder, delta)
 
 	-- Get target dist
 	local dist = max(0, get_target_dist() - 0.5)
+	-- printf("target_dist %s", dist)
 
 	-- Get max dist based on weapon
 	local max_dist = SYS_GetParam(0, sec, "kind", "") == "w_pistol" and max_dist - 0.34 or max_dist
@@ -499,8 +500,6 @@ function actor_on_update(binder, delta)
 	-- Adjust hud
 	enable_tilt(sec, wpn)
 	set_weapon_position(sec, new_pos, new_ori)
-
-	-- printf("target_dist %s", dist)
 end
 
 function actor_on_first_update()
