@@ -435,7 +435,7 @@ function actor_on_update(binder, delta)
 
 			local b = {
 				[0] = lerp(weapon_table[sec].hands_position[0], (o[0] + weapon_table[sec].hands_position[0]), coeff),
-				[1] = lerp(weapon_table[sec].hands_position[1], (o[1] + target_pos[1]), coeff ^ 0.8),
+				[1] = lerp(weapon_table[sec].hands_position[1], (o[1] + target_pos[1]), coeff ^ 0.85),
 				[2] = lerp(weapon_table[sec].hands_position[2], (o[2] + target_pos[2]), coeff ^ 2),
 			}
 
