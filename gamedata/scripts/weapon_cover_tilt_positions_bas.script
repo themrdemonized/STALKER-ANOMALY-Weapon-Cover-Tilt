@@ -352,18 +352,18 @@ if weapon_cover_tilt_positions then
 		y = 0.2,
 		z = -0.1,
 	}
-	-- o["wpn_pm_bas"] = {
-	-- 	y = 0.2,
-	-- }
-	-- o["wpn_pm_bas_actor"] = {
-	-- 	y = 0.2,
-	-- }
-	-- o["wpn_pm_bas_custom"] = {
-	-- 	y = 0.2,
-	-- }
-	-- o["wpn_pmm_bas"] = {
-	-- 	y = 0.2,
-	-- }
+	o["wpn_pm_bas"] = {
+		y = 0.05,
+	}
+	o["wpn_pm_bas_actor"] = {
+		y = 0.05,
+	}
+	o["wpn_pm_bas_custom"] = {
+		y = 0.05,
+	}
+	o["wpn_pmm_bas"] = {
+		y = 0.05,
+	}
 	-- o["wpn_walther_p99"] = {
 	-- 	y = 0.2,
 	-- }

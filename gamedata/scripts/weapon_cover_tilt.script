@@ -252,7 +252,7 @@ function soft_reset(wpn, sec, delta)
 		-- Increase speed of return to position when closer to it for zoomed weapons
 		local cobj = wpn:cast_Weapon()
 		local is_scoped = cobj and cobj:IsScopeAttached()
-		k = k * (is_scoped and normalize(smoothed_values.hands_orientation_y, weapon_table[sec].hands_orientation[1], max_deg) ^ 0.11 or 1)
+		k = k * (is_scoped and normalize(smoothed_values.hands_orientation_y, weapon_table[sec].hands_orientation[1], max_deg) ^ 0.105 or 1)
 
 		-- printf("cur %s, min %s, max %s, %s", smoothed_values.hands_orientation_y, weapon_table[sec].hands_orientation[1], max_deg, k)
 		local steps = get_weapon_steps(wpn, sec) * k
@@ -399,7 +399,7 @@ function actor_on_update(binder, delta)
 	local steps = get_weapon_steps(wpn, sec) * k
 
 	-- Apply non linear coefficient
-	local coeff = random_funcs.CircularEaseOut(1 - dist / max_dist)
+	local coeff = random_funcs.CircularEaseOutPowered(1 - dist / max_dist, 0.65)
 
 	-- Smooth the coeff
 	local coeff_smoothing = steps * 0.5
