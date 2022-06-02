@@ -415,26 +415,34 @@ function actor_on_update(binder, delta)
 		}
 	else
 		-- Check for scopes on weapons
-		local base_sec = sec
-		if not wpn_positions.weapon_offsets[base_sec] then
-			local parent = SYS_GetParam(0, base_sec, "parent_section", base_sec)
+		if not wpn_positions.weapon_offsets[sec] then
+			local parent = SYS_GetParam(0, sec, "parent_section", sec)
 			local scopes = str_explode(SYS_GetParam(0, parent, "scopes", ""), ",")
 			for k, v in pairs(scopes) do
-				if (parent .. "_" .. v) == base_sec then
-					base_sec = parent
+				if (parent .. "_" .. v) == sec then
+					wpn_positions.weapon_offsets[sec] = wpn_positions.weapon_offsets[parent]
 					break
 				end
+			end
+
+			-- Add table with 0 offsets if no weapon offset found
+			if not wpn_positions.weapon_offsets[sec] then
+				wpn_positions.weapon_offsets[sec] = {
+					x = 0,
+					y = 0,
+					z = 0
+				}
 			end
 		end
 
 		local o = {
-			[0] = wpn_positions.weapon_offsets[base_sec] and wpn_positions.weapon_offsets[base_sec].x or 0,
-			[1] = wpn_positions.weapon_offsets[base_sec] and wpn_positions.weapon_offsets[base_sec].y or 0,
-			[2] = wpn_positions.weapon_offsets[base_sec] and wpn_positions.weapon_offsets[base_sec].z or 0,
+			[0] = wpn_positions.weapon_offsets[sec].x or 0,
+			[1] = wpn_positions.weapon_offsets[sec].y or 0,
+			[2] = wpn_positions.weapon_offsets[sec].z or 0,
 		}
 
 		-- Interpolate between offseted position and desirable closer to obstacle, looks better, mostly
-		local is_pistol = SYS_GetParam(0, base_sec, "kind", "") == "w_pistol" and not not_pistol_sec[base_sec]
+		local is_pistol = SYS_GetParam(0, sec, "kind", "") == "w_pistol" and not not_pistol_sec[sec]
 		
 		-- Different calculations for pistols
 		if is_pistol then
