@@ -117,10 +117,11 @@ function reset_wpn_hud(sec)
 	hud_adjust.enabled(false)
 end
 
-local max_dist = 0.8
+local max_dist = 0.78
 local max_deg = 75
 local random_funcs = demonized_randomizing_functions
-local wpn_positions = weapon_cover_tilt_positions
+local wpn_positions = weapon_cover_tilt_positions or {}
+local wpn_radii = weapon_cover_tilt_gun_trigger_radii and weapon_cover_tilt_gun_trigger_radii.weapon_trigger_radii or {}
 
 -- Sections of weapons that have kind "pistol" but they arent pistols
 not_pistol_sec = {
@@ -169,6 +170,25 @@ local target_pos = {
 
 local tilt_enabled = false
 local firepos_state = 0
+local max_yaw = 10
+local max_roll = 10
+local yaw
+local roll
+
+function randomize_roll_yaw()
+	if not yaw then
+		yaw = random_float(-max_yaw, max_yaw)
+	end
+
+	if not roll then
+		roll = random_float(-max_roll, max_roll * 0.33)
+	end
+end
+
+function remove_roll_yaw()
+	yaw = nil
+	roll = nil
+end
 
 function enable_tilt(sec, wpn)
 	local weapon_zoomed = axr_main.scoped_weapon_is_zoomed
@@ -261,6 +281,11 @@ function soft_reset(wpn, sec, delta)
 		local coeff_smoothing = steps * 0.5
 		local coeff = ema("coeff", 0, 0, coeff_smoothing, delta)
 
+		-- Remove random roll and yaw if close to end
+		if coeff < 0.5 then
+			remove_roll_yaw()
+		end
+
 		local new_pos = {
 			[0] = ema("hands_position_x", lerp(weapon_table[sec].hands_position[0], smoothed_values.hands_position_x, coeff), weapon_table[sec].hands_position[0], steps, delta),
 			[1] = ema("hands_position_y", lerp(weapon_table[sec].hands_position[1], smoothed_values.hands_position_y, coeff), weapon_table[sec].hands_position[1], steps, delta),
@@ -268,9 +293,9 @@ function soft_reset(wpn, sec, delta)
 		}
 
 		local new_ori = {
-			[0] = weapon_table[sec].hands_orientation[0],
+			[0] = ema("hands_orientation_x", lerp(weapon_table[sec].hands_orientation[0], smoothed_values.hands_orientation_x, coeff), weapon_table[sec].hands_orientation[0], steps, delta),
 			[1] = ema("hands_orientation_y", lerp(weapon_table[sec].hands_orientation[1], smoothed_values.hands_orientation_y, coeff), weapon_table[sec].hands_orientation[1], steps, delta),
-			[2] = weapon_table[sec].hands_orientation[2],
+			[2] = ema("hands_orientation_z", lerp(weapon_table[sec].hands_orientation[2], smoothed_values.hands_orientation_z, coeff), weapon_table[sec].hands_orientation[2], steps, delta),
 		}
 
 		set_weapon_position(sec, new_pos, new_ori)
@@ -370,7 +395,24 @@ function actor_on_update(binder, delta)
 	-- printf("target_dist %s", dist)
 
 	-- Get max dist based on weapon
+	-- Check for scopes on weapons
+	if not wpn_radii[sec] then
+		local parent = SYS_GetParam(0, sec, "parent_section", sec)
+		local scopes = str_explode(SYS_GetParam(0, parent, "scopes", ""), ",")
+		for k, v in pairs(scopes) do
+			if (parent .. "_" .. v) == sec then
+				wpn_radii[sec] = wpn_radii[parent]
+				break
+			end
+		end
+
+		-- Add table with 0 offsets if no weapon offset found
+		if not wpn_radii[sec] then
+			wpn_radii[sec] = 0
+		end
+	end
 	local max_dist = SYS_GetParam(0, sec, "kind", "") == "w_pistol" and max_dist - 0.34 or max_dist
+	max_dist = max_dist + wpn_radii[sec]
 
 	-- Soft reset if distance is more than max_dist
 	if dist > max_dist then
@@ -499,10 +541,12 @@ function actor_on_update(binder, delta)
 		[2] = ema("hands_position_z", new_pos[2], weapon_table[sec].hands_position[2], steps, delta),
 	}
 
+	-- Randomize roll and yaw
+	randomize_roll_yaw()
 	local new_ori = {
-		[0] = weapon_table[sec].hands_orientation[0],
+		[0] = ema("hands_orientation_x", weapon_table[sec].hands_orientation[0] + (yaw or 0) * coeff, weapon_table[sec].hands_orientation[0], steps, delta),
 		[1] = ema("hands_orientation_y", weapon_table[sec].hands_orientation[1] + max_deg * coeff, weapon_table[sec].hands_orientation[1], steps, delta),
-		[2] = weapon_table[sec].hands_orientation[2],
+		[2] = ema("hands_orientation_z", weapon_table[sec].hands_orientation[2] + (roll or 0) * coeff, weapon_table[sec].hands_orientation[2], steps, delta),
 	}
 
 	-- Adjust hud
