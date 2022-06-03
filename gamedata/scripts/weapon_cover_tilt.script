@@ -51,6 +51,30 @@ local function lerp(a, b, f)
 	end
 end
 
+-- MCM
+-- Load the defaults
+local function load_defaults()
+	local t = {}
+	local op = weapon_cover_tilt_mcm.op
+	for i, v in ipairs(op.gr) do
+		if v.def ~= nil then
+			t[v.id] = v.def
+		end
+	end
+	return t
+end
+
+local settings = load_defaults()
+
+local function load_settings()
+	settings = load_defaults()
+	if ui_mcm then
+		for k, v in pairs(settings) do
+			settings[k] = ui_mcm.get("weapon_cover_tilt/" .. k)
+		end
+	end
+end
+
 function debug_enabled()
 	return DEV_DEBUG or DEV_DEBUG_DEV
 end
@@ -117,7 +141,6 @@ function reset_wpn_hud(sec)
 	hud_adjust.enabled(false)
 end
 
-local max_dist = 0.78
 local max_deg = 75
 local random_funcs = demonized_randomizing_functions
 local wpn_positions = weapon_cover_tilt_positions or {}
@@ -158,8 +181,8 @@ end
 local target_pos = {
 	hands_position_pistol = {
 		[0] = -0.050912,
-		[1] = -0.696908,
-		[2] = 0.260633,
+		[1] = -0.646908,
+		[2] = 0.310633,
 	},
 	hands_position_rifle = {
 		[0] = 0.055224,
@@ -170,17 +193,17 @@ local target_pos = {
 
 local tilt_enabled = false
 local firepos_state = 0
-local max_yaw = 10
-local max_roll = 10
 local yaw
 local roll
 
 function randomize_roll_yaw()
 	if not yaw then
+		local max_yaw = settings.yaw_variation
 		yaw = random_float(-max_yaw, max_yaw)
 	end
 
 	if not roll then
+		local max_roll = settings.roll_variation
 		roll = random_float(-max_roll, max_roll * 0.33)
 	end
 end
@@ -248,7 +271,7 @@ function get_weapon_weight(wpn, sec)
 end
 
 function get_weapon_steps(wpn, sec)
-	return default_smoothing * (1 + get_weapon_weight(wpn, sec) * 0.07)
+	return settings.animation_speed * (1 + get_weapon_weight(wpn, sec) * (settings.animation_weight_coeff * 0.07))
 end
 
 function set_weapon_position(sec, new_pos, new_ori)
@@ -411,8 +434,9 @@ function actor_on_update(binder, delta)
 			wpn_radii[sec] = 0
 		end
 	end
-	local max_dist = SYS_GetParam(0, sec, "kind", "") == "w_pistol" and max_dist - 0.34 or max_dist
-	max_dist = max_dist + wpn_radii[sec]
+
+	local max_dist = settings.trigger_radius
+	max_dist = (SYS_GetParam(0, sec, "kind", "") == "w_pistol" and max_dist - 0.34 or max_dist) + wpn_radii[sec]
 
 	-- Soft reset if distance is more than max_dist
 	if dist > max_dist then
@@ -447,13 +471,14 @@ function actor_on_update(binder, delta)
 	local coeff_smoothing = steps * 0.5
 	coeff = ema("coeff", coeff, 0, coeff_smoothing, delta)
 	
+	local is_pistol = SYS_GetParam(0, sec, "kind", "") == "w_pistol" and not not_pistol_sec[sec]
 	local new_pos
 	if wpn_positions.weapon_positions[sec] then
 		local p = wpn_positions.weapon_positions[sec]
 		new_pos = {
 			[0] = lerp(weapon_table[sec].hands_position[0], p.x or weapon_table[sec].hands_position[0], coeff),
 			[1] = lerp(weapon_table[sec].hands_position[1], p.y or weapon_table[sec].hands_position[1], coeff),
-			[2] = lerp(weapon_table[sec].hands_position[2], p.z or weapon_table[sec].hands_position[2], coeff ^ 4),
+			[2] = lerp(weapon_table[sec].hands_position[2], p.z or weapon_table[sec].hands_position[2], coeff ^ 3.5),
 		}
 	else
 		-- Check for scopes on weapons
@@ -484,11 +509,13 @@ function actor_on_update(binder, delta)
 		}
 
 		-- Interpolate between offseted position and desirable closer to obstacle, looks better, mostly
-		local is_pistol = SYS_GetParam(0, sec, "kind", "") == "w_pistol" and not not_pistol_sec[sec]
-		
 		-- Different calculations for pistols
 		if is_pistol then
-			local target_pos = target_pos.hands_position_pistol 
+			local target_pos = {
+				[0] = weapon_table[sec].hands_position[0] + settings.offset_x,
+				[1] = target_pos.hands_position_pistol[1] + settings.offset_y,
+				[2] = target_pos.hands_position_pistol[2] + settings.offset_z,
+			}
 
 			-- local a = {
 			-- 	[0] = weapon_table[sec].hands_position[0] + o[0] * coeff,
@@ -497,8 +524,8 @@ function actor_on_update(binder, delta)
 			-- }
 
 			local b = {
-				[0] = lerp(weapon_table[sec].hands_position[0], (o[0] + weapon_table[sec].hands_position[0]), coeff),
-				[1] = lerp(weapon_table[sec].hands_position[1], (o[1] + target_pos[1]), coeff ^ 0.85),
+				[0] = lerp(weapon_table[sec].hands_position[0], (o[0] + target_pos[0]), coeff),
+				[1] = lerp(weapon_table[sec].hands_position[1], (o[1] + target_pos[1]), coeff),
 				[2] = lerp(weapon_table[sec].hands_position[2], (o[2] + target_pos[2]), coeff ^ 2),
 			}
 
@@ -510,24 +537,28 @@ function actor_on_update(binder, delta)
 
 			new_pos = b
 		else
-			local target_pos = target_pos.hands_position_rifle
+			local target_pos = {
+				[0] = weapon_table[sec].hands_position[0] + settings.offset_x,
+				[1] = target_pos.hands_position_rifle[1] + settings.offset_y,
+				[2] = target_pos.hands_position_rifle[2] + settings.offset_z,
+			}
 
 			local a = {
 				[0] = weapon_table[sec].hands_position[0] + o[0] * coeff,
 				[1] = weapon_table[sec].hands_position[1] + (o[1] + position_coeff_y) * coeff,
-				[2] = weapon_table[sec].hands_position[2] + (o[2] + position_coeff_z) * coeff ^ 4,
+				[2] = weapon_table[sec].hands_position[2] + (o[2] + position_coeff_z) * coeff ^ 3.5,
 			}
 
 			local b = {
-				[0] = lerp(weapon_table[sec].hands_position[0], (o[0] + weapon_table[sec].hands_position[0]), coeff),
+				[0] = lerp(weapon_table[sec].hands_position[0], (o[0] + target_pos[0]), coeff),
 				[1] = lerp(weapon_table[sec].hands_position[1], (o[1] + target_pos[1]), coeff),
-				[2] = lerp(weapon_table[sec].hands_position[2], (o[2] + target_pos[2]), coeff ^ 4),
+				[2] = lerp(weapon_table[sec].hands_position[2], (o[2] + target_pos[2]), coeff ^ 3.5),
 			}
 
 			local c = {
 				[0] = lerp(a[0], b[0], coeff),
 				[1] = lerp(a[1], b[1], coeff),
-				[2] = lerp(a[2], b[2], coeff ^ 4),
+				[2] = lerp(a[2], b[2], coeff ^ 3.5),
 			}
 
 			new_pos = c
@@ -544,9 +575,9 @@ function actor_on_update(binder, delta)
 	-- Randomize roll and yaw
 	randomize_roll_yaw()
 	local new_ori = {
-		[0] = ema("hands_orientation_x", weapon_table[sec].hands_orientation[0] + (yaw or 0) * coeff, weapon_table[sec].hands_orientation[0], steps, delta),
+		[0] = ema("hands_orientation_x", weapon_table[sec].hands_orientation[0] + yaw * coeff, weapon_table[sec].hands_orientation[0], steps, delta),
 		[1] = ema("hands_orientation_y", weapon_table[sec].hands_orientation[1] + max_deg * coeff, weapon_table[sec].hands_orientation[1], steps, delta),
-		[2] = ema("hands_orientation_z", weapon_table[sec].hands_orientation[2] + (roll or 0) * coeff, weapon_table[sec].hands_orientation[2], steps, delta),
+		[2] = ema("hands_orientation_z", weapon_table[sec].hands_orientation[2] + roll * coeff, weapon_table[sec].hands_orientation[2], steps, delta),
 	}
 
 	-- Adjust hud
@@ -554,9 +585,25 @@ function actor_on_update(binder, delta)
 	set_weapon_position(sec, new_pos, new_ori)
 end
 
+function reset_settings()
+	load_settings()
+	if settings.enabled then
+		RegisterScriptCallback("actor_on_update", actor_on_update)
+	else
+		local sec
+		if db.actor then
+			local wpn = db.actor:active_item()
+			sec = wpn and wpn:section()
+		end
+		reset(sec)
+		UnregisterScriptCallback("actor_on_update", actor_on_update)
+	end
+end
+
 function actor_on_first_update()
 	-- firepos_state = debug_enabled() and get_console_cmd(0, "g_firepos") or 0
 	firepos_state = 0
+	reset_settings()
 end
 
 -- Reset without parameter, for callbacks
@@ -565,6 +612,7 @@ function reset_func()
 end
 
 function on_game_start()
+	RegisterScriptCallback("on_option_change", reset_settings)
 	RegisterScriptCallback("actor_on_before_death", reset_func)
 	RegisterScriptCallback("actor_on_net_destroy", reset_func)
 	RegisterScriptCallback("on_before_level_changing", reset_func)

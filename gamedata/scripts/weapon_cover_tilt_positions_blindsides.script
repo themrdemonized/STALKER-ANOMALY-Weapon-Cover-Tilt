@@ -208,7 +208,7 @@ if weapon_cover_tilt_positions then
 		y = 0.1,
 	}
 
-	-- SMG, unused
+	-- SMG
 	-- o["wpn_kiparis"] = {
 	-- 	y = 0.2,
 	-- }
@@ -231,55 +231,55 @@ if weapon_cover_tilt_positions then
 
 	--Pistols
 	o["wpn_aps"] = {
-		y = 0.2,
+		y = 0.15,
 		z = -0.1,
 	}
 	o["wpn_cz52"] = {
-		y = 0.2,
+		y = 0.15,
 		z = -0.1,
 	}
 	o["wpn_fort"] = {
-		y = 0.2,
+		y = 0.15,
 		z = -0.1,
 	}
 	o["wpn_fort_snag"] = {
-		y = 0.2,
+		y = 0.15,
 		z = -0.1,
 	}
 	o["wpn_mp443"] = {
-		y = 0.2,
+		y = 0.15,
 		z = -0.1,
 	}
 	o["wpn_pb"] = {
-		y = 0.2,
+		y = 0.15,
 		z = -0.1,
 	}
 	o["wpn_pb_custom"] = {
-		y = 0.2,
+		y = 0.15,
 		z = -0.1,
 	}
 	o["wpn_pm"] = {
-		y = 0.2,
+		y = 0.15,
 		z = -0.1,
 	}
 	o["wpn_pm_actor"] = {
-		y = 0.2,
+		y = 0.15,
 		z = -0.1,
 	}
 	o["wpn_pm_custom"] = {
-		y = 0.2,
+		y = 0.15,
 		z = -0.1,
 	}
 	o["wpn_pmm"] = {
-		y = 0.2,
+		y = 0.15,
 		z = -0.1,
 	}
 	o["wpn_tt33"] = {
-		y = 0.2,
+		y = 0.15,
 		z = -0.1,
 	}
 	o["wpn_tt33_modern"] = {
-		y = 0.2,
+		y = 0.15,
 		z = -0.1,
 	}
 

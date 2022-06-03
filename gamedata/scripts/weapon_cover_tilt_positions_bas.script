@@ -286,97 +286,97 @@ if weapon_cover_tilt_positions then
 
 	-- Pistols
 	o["wpn_aps_bas"] = {
-		y = 0.2,
+		y = 0.15,
 		z = -0.05,
 	}
 	o["wpn_aps_bas_apsabigo"] = {
-		y = 0.2,
+		y = 0.15,
 		z = -0.05,
 	}
 	-- o["wpn_colt1911_n"] = {
-	-- 	y = 0.2,
+	-- 	y = 0.15,
 	-- }
 	-- o["wpn_fn57"] = {
-	-- 	y = 0.2,
+	-- 	y = 0.15,
 	-- }
 	-- o["wpn_glock17"] = {
-	-- 	y = 0.2,
+	-- 	y = 0.15,
 	-- }
 	-- o["wpn_glock17_m1"] = {
-	-- 	y = 0.2,
+	-- 	y = 0.15,
 	-- }
 	o["wpn_korth"] = {
-		y = 0.25,
+		y = 0.20,
 		z = -0.16,
 	}
 	o["wpn_korth_custom"] = {
-		y = 0.25,
+		y = 0.20,
 		z = -0.16,
 	}
 	-- o["wpn_sig220_n"] = {
-	-- 	y = 0.2,
+	-- 	y = 0.15,
 	-- }
 	-- o["wpn_sig226"] = {
-	-- 	y = 0.2,
+	-- 	y = 0.15,
 	-- }
 	-- o["wpn_usp_tac"] = {
-	-- 	y = 0.2,
+	-- 	y = 0.15,
 	-- }
 	-- o["wpn_pb_bas"] = {
-	-- 	y = 0.2,
+	-- 	y = 0.15,
 	-- }
 	-- o["wpn_pb_bas_custom"] = {
-	-- 	y = 0.2,
+	-- 	y = 0.15,
 	-- }
 	o["wpn_pl15"] = {
-		y = 0.2,
+		y = 0.15,
 		z = -0.1,
 	}
 	o["wpn_pl15_lazup_pl15"] = {
-		y = 0.2,
+		y = 0.15,
 		z = -0.1,
 	}
 	o["wpn_pl15_pl15_scolaz"] = {
-		y = 0.2,
+		y = 0.15,
 		z = -0.1,
 	}
 	o["wpn_pl15_tan"] = {
-		y = 0.2,
+		y = 0.15,
 		z = -0.1,
 	}
 	o["wpn_pl15_tan_lazup_pl15"] = {
-		y = 0.2,
+		y = 0.15,
 		z = -0.1,
 	}
 	o["wpn_pl15_tan_pl15_scolaz"] = {
-		y = 0.2,
+		y = 0.15,
 		z = -0.1,
 	}
-	o["wpn_pm_bas"] = {
-		y = 0.05,
-	}
-	o["wpn_pm_bas_actor"] = {
-		y = 0.05,
-	}
-	o["wpn_pm_bas_custom"] = {
-		y = 0.05,
-	}
-	o["wpn_pmm_bas"] = {
-		y = 0.05,
-	}
+	-- o["wpn_pm_bas"] = {
+	-- 	y = 0.00,
+	-- }
+	-- o["wpn_pm_bas_actor"] = {
+	-- 	y = 0.00,
+	-- }
+	-- o["wpn_pm_bas_custom"] = {
+	-- 	y = 0.00,
+	-- }
+	-- o["wpn_pmm_bas"] = {
+	-- 	y = 0.00,
+	-- }
 	-- o["wpn_walther_p99"] = {
-	-- 	y = 0.2,
+	-- 	y = 0.15,
 	-- }
 
 	function on_game_start()
 		-- If blindsides patch enabled - disable their positions
 		if weapon_cover_tilt_positions_blindsides then
 			o["wpn_pb"] = {
-				y = 0,
+				y = -0.05,
 				z = 0,
 			}
 			o["wpn_pb_custom"] = {
-				y = 0,
+				y = -0.05,
 				z = 0,
 			}
 		end

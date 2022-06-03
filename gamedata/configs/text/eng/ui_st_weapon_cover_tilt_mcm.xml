@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="windows-1251"?>
+
+<string_table>
+	
+	<string id="ui_mcm_weapon_cover_tilt_title">
+		<text>Weapon Cover Tilt</text>
+	</string>
+	<string id="ui_mcm_menu_weapon_cover_tilt">
+		<text>Weapon Cover Tilt</text>
+	</string>
+
+	<string id="ui_mcm_weapon_cover_tilt_enabled">
+		<text>Enable</text>
+	</string>
+	<string id="ui_mcm_weapon_cover_tilt_animation_speed">
+		<text>Animation speed</text>
+	</string>
+	<string id="ui_mcm_weapon_cover_tilt_animation_speed_desc">
+		<text>Less value is faster animation</text>
+	</string>
+	<string id="ui_mcm_weapon_cover_tilt_animation_weight_coeff">
+		<text>Weight Factor</text>
+	</string>
+	<string id="ui_mcm_weapon_cover_tilt_animation_weight_coeff_desc">
+		<text>The higher the number, the greater is effect of the weight of the weapon on the speed of the animation</text>
+	</string>
+	<string id="ui_mcm_weapon_cover_tilt_trigger_radius">
+		<text>Trigger radius in meters</text>
+	</string>
+	<string id="ui_mcm_weapon_cover_tilt_offset_x">
+		<text>Weapon position offset by X</text>
+	</string>
+	<string id="ui_mcm_weapon_cover_tilt_offset_x_desc">
+		<text>&lt; 0 - left. &gt; 0 - right</text>
+	</string>
+	<string id="ui_mcm_weapon_cover_tilt_offset_y">
+		<text>Weapon position offset by Y</text>
+	</string>
+	<string id="ui_mcm_weapon_cover_tilt_offset_y_desc">
+		<text>&lt; 0 - down. &gt; 0 - up.</text>
+	</string>
+	<string id="ui_mcm_weapon_cover_tilt_offset_z">
+		<text>Weapon position offset by Z</text>
+	</string>
+	<string id="ui_mcm_weapon_cover_tilt_offset_z_desc">
+		<text>&lt; 0 - backward. &gt; 0 - forward</text>
+	</string>
+	<string id="ui_mcm_weapon_cover_tilt_yaw_variation">
+		<text>Weapon yaw variation.</text>
+	</string>
+	<string id="ui_mcm_weapon_cover_tilt_yaw_variation_desc">
+		<text>When a weapon is raised, it will be randomly yawed by +- a given degree for more animation variation</text>
+	</string>
+	<string id="ui_mcm_weapon_cover_tilt_roll_variation">
+		<text>Weapon roll variation</text>
+	</string>
+	<string id="ui_mcm_weapon_cover_tilt_roll_variation_desc">
+		<text>When a weapon is raised, it will be randomly rolled by +- a given degree for more animation variation</text>
+	</string>
+	
+</string_table>
