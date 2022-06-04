@@ -13,7 +13,7 @@
 		<text>Enable</text>
 	</string>
 	<string id="ui_mcm_weapon_cover_tilt_animation_speed">
-		<text>Animation speed</text>
+		<text>Animation inertia</text>
 	</string>
 	<string id="ui_mcm_weapon_cover_tilt_animation_speed_desc">
 		<text>Less value is faster animation</text>

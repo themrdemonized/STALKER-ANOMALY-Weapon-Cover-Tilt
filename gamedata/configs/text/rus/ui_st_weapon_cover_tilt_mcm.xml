@@ -13,7 +13,7 @@
 		<text>Включить</text>
 	</string>
 	<string id="ui_mcm_weapon_cover_tilt_animation_speed">
-		<text>Скорость анимации</text>
+		<text>Инерция анимации</text>
 	</string>
 	<string id="ui_mcm_weapon_cover_tilt_animation_speed_desc">
 		<text>Чем меньше - тем быстрее анимация</text>
