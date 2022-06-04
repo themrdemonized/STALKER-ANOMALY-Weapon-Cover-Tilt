@@ -79,11 +79,6 @@ function debug_enabled()
 	return DEV_DEBUG or DEV_DEBUG_DEV
 end
 
-function IsBinoc(sec)
-	return 	SYS_GetParam(0, sec, "ammo_class", "") == "ammo_binoc"
-	or 		SYS_GetParam(0, sec, "class", "") == "WP_BINOC"
-end
-
 local parameters = {
 -- Type: 0 = string | 1 = number | 2 = 3d vector | 3 = 4d vector | 
 	["hands_position"]		            = { name = "Hands Position",         typ = 2, def = {0,0,0}, indx = 1,  min = -180,   max = 180, step = 0.00001, idxa = 0, idxb = 0,  hud = true },
@@ -139,6 +134,29 @@ function reset_wpn_hud(sec)
 		end
 	end
 	hud_adjust.enabled(false)
+end
+
+function IsBinoc(sec)
+	return 	SYS_GetParam(0, sec, "ammo_class", "") == "ammo_binoc"
+	or 		SYS_GetParam(0, sec, "class", "") == "WP_BINOC"
+end
+
+local scoped_weapon_zoomed = false
+function isScopedWeapon(wpn)
+	if not wpn then return false end
+
+	-- If there is fixed scope or no scope defined, but also if there is a scope texture, it will use the texture for zoomin and considered a scoped weapon
+	if (wpn:weapon_scope_status() == 1 or wpn:weapon_scope_status() == 0) and SYS_GetParam(0, wpn:section(), "scope_texture", "") ~= "" then
+		return true
+	end
+
+	-- Usual check
+	local cobj = wpn:cast_Weapon()
+	if (cobj and cobj:IsScopeAttached() or wpn:weapon_is_scope()) and SYS_GetParam(0, wpn:section(), "scope_texture", "") ~= "" then
+		return true
+	end
+
+	return false
 end
 
 local max_deg = 75
@@ -214,8 +232,7 @@ function remove_roll_yaw()
 end
 
 function enable_tilt(sec, wpn)
-	local weapon_zoomed = axr_main.scoped_weapon_is_zoomed
-	if weapon_zoomed then
+	if scoped_weapon_zoomed then
 		if (get_console():get_bool("wpn_aim_toggle")) then
 			level.press_action(bind_to_dik(key_bindings.kWPN_ZOOM))
 		else
@@ -293,8 +310,7 @@ function soft_reset(wpn, sec, delta)
 		local k = max(1, 1.5 - (1 - normalize(smoothed_values.hands_orientation_y or max_deg, weapon_table[sec].hands_orientation[1], max_deg)))
 
 		-- Increase speed of return to position when closer to it for zoomed weapons
-		local cobj = wpn:cast_Weapon()
-		local is_scoped = cobj and cobj:IsScopeAttached()
+		local is_scoped = isScopedWeapon(wpn)
 		k = k * (is_scoped and normalize(smoothed_values.hands_orientation_y, weapon_table[sec].hands_orientation[1], max_deg) ^ 0.105 or 1)
 
 		-- printf("cur %s, min %s, max %s, %s", smoothed_values.hands_orientation_y, weapon_table[sec].hands_orientation[1], max_deg, k)
@@ -323,8 +339,7 @@ function soft_reset(wpn, sec, delta)
 
 		set_weapon_position(sec, new_pos, new_ori)
 
-		local weapon_zoomed = axr_main.scoped_weapon_is_zoomed
-		if weapon_zoomed then
+		if scoped_weapon_zoomed then
 			if (get_console():get_bool("wpn_aim_toggle")) then
 				level.press_action(bind_to_dik(key_bindings.kWPN_ZOOM))
 			else
@@ -585,6 +600,14 @@ function actor_on_update(binder, delta)
 	set_weapon_position(sec, new_pos, new_ori)
 end
 
+function actor_on_weapon_zoom_in(obj)
+	scoped_weapon_zoomed = isScopedWeapon(obj)
+end
+
+function actor_on_weapon_zoom_out(obj)
+	scoped_weapon_zoomed = false
+end
+
 function reset_settings()
 	load_settings()
 	if settings.enabled then
@@ -618,4 +641,6 @@ function on_game_start()
 	RegisterScriptCallback("on_before_level_changing", reset_func)
 	RegisterScriptCallback("actor_on_first_update", actor_on_first_update)
 	RegisterScriptCallback("actor_on_update", actor_on_update)
+	RegisterScriptCallback("actor_on_weapon_zoom_in", actor_on_weapon_zoom_in)
+	RegisterScriptCallback("actor_on_weapon_zoom_out", actor_on_weapon_zoom_out)
 end
