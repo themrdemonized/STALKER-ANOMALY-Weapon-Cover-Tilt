@@ -21,9 +21,6 @@ weapon_trigger_radii = {
 	["wpn_mp5_alt"] = -0.1,
 	["wpn_mp5_custom"] = -0.1,
 	["wpn_mp5_nimble"] = -0.1,
-	["wpn_mp5sd"] = -0.1,
-	["wpn_mp5sd_custom"] = -0.1,
-	["wpn_mp5sd_new"] = -0.1,
 	["wpn_sig552"] = -0.1,
 	["wpn_ump45"] = -0.1,
 	["wpn_ump45_custom"] = -0.1,
@@ -83,8 +80,8 @@ weapon_trigger_radii = {
 	["wpn_l96a1m"] = 0.2,
 	["wpn_k98"] = 0.1,
 	["wpn_mosin"] = 0.2,
-	["wpn_m98b"] = 0.2,
-	["wpn_m82"] = 0.2,
+	["wpn_m98b"] = 0.25,
+	["wpn_m82"] = 0.25,
 	["wpn_svd"] = 0.2,
 	["wpn_svd_custom"] = 0.2,
 	["wpn_svd_nimble"] = 0.2,
@@ -97,40 +94,16 @@ weapon_trigger_radii = {
 	["wpn_toz34_mark4"] = 0.2,
 	["wpn_bm16_full"] = 0.2,
 	["wpn_bm16_full_alt"] = 0.2,
-	["wpn_mossberg590"] = -0.1,
-	["wpn_spas12"] = -0.1,
-	["wpn_spas12_custom"] = -0.1,
-	["wpn_spas12_nimble"] = -0.1,
 	["wpn_wincheaster1300"] = -0.1,
 	["wpn_wincheaster1300_trapper"] = -0.1,
 	["wpn_fort500"] = -0.1,
-	["wpn_protecta"] = -0.1,
-	["wpn_protecta_aim"] = -0.1,
-	["wpn_protecta_camo"] = -0.1,
-	["wpn_protecta_custom"] = -0.1,
-	["wpn_protecta_nimble"] = -0.1,
+	["wpn_protecta"] = -0.15,
+	["wpn_protecta_aim"] = -0.15,
+	["wpn_protecta_camo"] = -0.15,
+	["wpn_protecta_custom"] = -0.15,
+	["wpn_protecta_nimble"] = -0.15,
 	["wpn_gauss"] = 0.2,
 	["pri_a17_gauss_rifle"] = 0.2,
 	["wpn_m79"] = -0.1,
 	["wpn_rg-6"] = -0.1,	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
