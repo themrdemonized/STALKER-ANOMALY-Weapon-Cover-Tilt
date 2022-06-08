@@ -679,7 +679,9 @@ function actor_on_update(binder, delta)
 
 	-- Adjust hud
 	enable_tilt(sec, wpn)
-	callback("actor_on_weapon_tilting", wpn, coeff ~= 0 and coeff)
+	if coeff ~= 0 then
+		callback("actor_on_weapon_tilting", wpn, coeff)
+	end
 	set_weapon_position(sec, new_pos, new_ori)
 end
 
