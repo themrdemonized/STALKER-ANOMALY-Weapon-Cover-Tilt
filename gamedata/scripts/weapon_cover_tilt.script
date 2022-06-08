@@ -428,10 +428,6 @@ function actor_on_update(binder, delta)
 		return soft_reset(wpn, sec, delta)
 	end
 
-	-- Get target dist
-	local dist = max(0, get_target_dist() - 0.5)
-	-- printf("target_dist %s", dist)
-
 	-- Get max dist based on weapon
 	-- Check for scopes on weapons
 	if not wpn_radii[sec] then
@@ -453,6 +449,10 @@ function actor_on_update(binder, delta)
 	local max_dist = settings.trigger_radius
 	max_dist = (SYS_GetParam(0, sec, "kind", "") == "w_pistol" and max_dist - 0.34 or max_dist) + wpn_radii[sec]
 
+	-- Get target dist
+	local dist = max(0, get_target_dist() - 0.5)
+	-- printf("target_dist %s", dist)
+
 	-- Soft reset if distance is more than max_dist
 	if dist > max_dist then
 		return soft_reset(wpn, sec, delta)
@@ -463,7 +463,7 @@ function actor_on_update(binder, delta)
 	if target_obj then
 		if IsMonster(target_obj) then
 			return soft_reset(wpn, sec, delta)
-		elseif IsStalker(target_obj) and xr_combat_ignore.is_enemy(actor, target_obj, true) then
+		elseif IsStalker(target_obj) and xr_combat_ignore.is_enemy(target_obj, actor, true) then
 			return soft_reset(wpn, sec, delta)
 		end
 	end
