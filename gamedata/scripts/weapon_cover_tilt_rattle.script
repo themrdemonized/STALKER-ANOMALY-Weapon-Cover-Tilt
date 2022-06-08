@@ -41,6 +41,8 @@ function get_sounds(dir)
 end
 
 function play_sound(dir, wpn, coeff)
+	if not wct.get_setting("tilt_rattle") then return end
+	
 	get_sounds(dir)
 	if sound and sound:playing() then
 		sound:stop()
