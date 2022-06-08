@@ -51,6 +51,36 @@ local function lerp(a, b, f)
 	end
 end
 
+local intercepts = {
+	["actor_on_weapon_before_tilt"] = {}, -- Params: weapon_object, flags
+	["actor_on_weapon_tilt_start"] = {}, -- Params: weapon_object
+	["actor_on_weapon_tilt_end"] = {}, -- Params: weapon_object
+	["actor_on_weapon_tilting"] = {}, -- Params: weapon_object, coeff
+	["actor_on_weapon_tilting_back"] = {}, -- Params: weapon_object, coeff
+}
+
+function add_intercept(name)
+	if intercepts[name] then return end
+	intercepts[name] = {}
+end
+
+function add_callback(name, func)
+	if not (name and func and intercepts[name]) then return end
+	intercepts[name][func] = true
+end
+
+function remove_callback(name, func)
+	if not (name and func and intercepts[name]) then return end
+	intercepts[name][func] = nil 
+end
+
+function callback(name, ...)
+	if not (name and intercepts[name]) then return end
+	for func, _ in pairs(intercepts[name]) do
+		func(...)
+	end
+end
+
 -- MCM
 -- Load the defaults
 local function load_defaults()
@@ -73,6 +103,10 @@ local function load_settings()
 			settings[k] = ui_mcm.get("weapon_cover_tilt/" .. k)
 		end
 	end
+end
+
+function get_setting(key)
+	return settings[key]
 end
 
 function debug_enabled()
@@ -284,6 +318,7 @@ function enable_tilt(sec, wpn)
 		end
 
 		tilt_enabled = true
+		callback("actor_on_weapon_tilt_start", wpn)
 	end
 end
 
@@ -304,6 +339,7 @@ function reset(sec)
 		smoothed_values.hands_orientation_z = nil
 		smoothed_values.coeff = nil
 		tilt_enabled = false
+		callback("actor_on_weapon_tilt_end", wpn)
 	end
 end
 
@@ -346,6 +382,8 @@ function soft_reset(wpn, sec, delta)
 		-- Smooth the coeff
 		local coeff_smoothing = steps * 0.5
 		local coeff = ema("coeff", 0, 0, coeff_smoothing, delta)
+
+		callback("actor_on_weapon_tilting_back", wpn, coeff)
 
 		-- Remove random roll and yaw if close to end
 		if coeff < 0.5 then
@@ -438,6 +476,15 @@ function actor_on_update(binder, delta)
 		end
 	else
 		reset_on_show_done = false
+	end
+
+	-- Reset if callback function set enabled to false
+	local flags = {
+		enabled = true
+	}
+	callback("actor_on_weapon_before_tilt", wpn, flags)
+	if not flags.enabled then
+		return reset(sec)
 	end
 
 	-- Soft reset if weapon is lowered
@@ -632,6 +679,7 @@ function actor_on_update(binder, delta)
 
 	-- Adjust hud
 	enable_tilt(sec, wpn)
+	callback("actor_on_weapon_tilting", wpn, coeff ~= 0 and coeff)
 	set_weapon_position(sec, new_pos, new_ori)
 end
 
