@@ -159,10 +159,37 @@ function isScopedWeapon(wpn)
 	return false
 end
 
+function isSilencedWeapon(wpn)
+	if not wpn then return false end
+
+	local cobj = wpn:cast_Weapon()
+	return 	wpn:weapon_silencer_status() == 2
+	and 	(cobj:IsSilencerAttached() or wpn:weapon_is_silencer() or utils_item.addon_attached(wpn, "sl"))
+end
+
 local max_deg = 75
 local random_funcs = demonized_randomizing_functions
 local wpn_positions = weapon_cover_tilt_positions or {}
 local wpn_radii = weapon_cover_tilt_gun_trigger_radii and weapon_cover_tilt_gun_trigger_radii.weapon_trigger_radii or {}
+
+function getBestMatch(sec)
+	local best_match, best_match_l = nil, 0
+	local function getMatch(k, s1, s2)
+		local a, b = s1:find(s2)
+		if a and b then
+			local l = b - a + 1
+			if l > best_match_l then
+				best_match = k
+				best_match_l = l
+			end
+		end
+	end
+	for k, v in pairs(wpn_radii) do
+		getMatch(k, sec, k)
+		-- getMatch(k, k, sec)
+	end
+	return best_match
+end
 
 -- Sections of weapons that have kind "pistol" but they arent pistols
 not_pistol_sec = {
@@ -440,6 +467,13 @@ function actor_on_update(binder, delta)
 			end
 		end
 
+		if not wpn_radii[sec] then
+			local best_match = getBestMatch(sec)
+			if best_match then
+				wpn_radii[sec] = wpn_radii[best_match]
+			end
+		end
+
 		-- Add table with 0 offsets if no weapon offset found
 		if not wpn_radii[sec] then
 			wpn_radii[sec] = 0
@@ -448,6 +482,11 @@ function actor_on_update(binder, delta)
 
 	local max_dist = settings.trigger_radius
 	max_dist = (SYS_GetParam(0, sec, "kind", "") == "w_pistol" and max_dist - 0.34 or max_dist) + wpn_radii[sec]
+
+	-- Check if gun supports silencer and is attached, increase trigger radius
+	if settings.consider_silencer and isSilencedWeapon(wpn) then
+		max_dist = max_dist + 0.12
+	end
 
 	-- Get target dist
 	local dist = max(0, get_target_dist() - 0.5)
@@ -460,12 +499,8 @@ function actor_on_update(binder, delta)
 
 	-- Soft reset if target is enemy stalker or monster
 	local target_obj = get_target_obj()
-	if target_obj then
-		if IsMonster(target_obj) then
-			return soft_reset(wpn, sec, delta)
-		elseif IsStalker(target_obj) and xr_combat_ignore.is_enemy(target_obj, actor, true) then
-			return soft_reset(wpn, sec, delta)
-		end
+	if target_obj and (IsMonster(target_obj) or (IsStalker(target_obj) and xr_combat_ignore.is_enemy(target_obj, actor, true))) then
+		return soft_reset(wpn, sec, delta)
 	end
 
 	-- printf("coeff %s, dist %s, max_dist %s", coeff, dist, max_dist)
