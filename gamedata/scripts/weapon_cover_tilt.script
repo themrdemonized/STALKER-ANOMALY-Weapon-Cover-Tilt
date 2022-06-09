@@ -254,6 +254,7 @@ function add_to_weapon_table(sec)
 			}
 		end)(),
 		inv_weight = SYS_GetParam(2, sec, "inv_weight", 0),
+		zoom_rotate_time = SYS_GetParam(2, sec, "zoom_rotate_time", 0.25),
 	}
 end
 
@@ -374,7 +375,8 @@ function soft_reset(wpn, sec, delta)
 
 		-- Increase speed of return to position when closer to it for zoomed weapons
 		local is_scoped = isScopedWeapon(wpn)
-		k = k * (is_scoped and normalize(smoothed_values.hands_orientation_y, weapon_table[sec].hands_orientation[1], max_deg) ^ 0.105 or 1)
+		local scope_magnitude = 0.105
+		k = k * (is_scoped and normalize(smoothed_values.hands_orientation_y, weapon_table[sec].hands_orientation[1], max_deg) ^ scope_magnitude or 1)
 
 		-- printf("cur %s, min %s, max %s, %s", smoothed_values.hands_orientation_y, weapon_table[sec].hands_orientation[1], max_deg, k)
 		local steps = get_weapon_steps(wpn, sec) * k
@@ -382,8 +384,6 @@ function soft_reset(wpn, sec, delta)
 		-- Smooth the coeff
 		local coeff_smoothing = steps * 0.5
 		local coeff = ema("coeff", 0, 0, coeff_smoothing, delta)
-
-		callback("actor_on_weapon_tilting_back", wpn, coeff)
 
 		-- Remove random roll and yaw if close to end
 		if coeff < 0.5 then
@@ -402,13 +402,36 @@ function soft_reset(wpn, sec, delta)
 			[2] = ema("hands_orientation_z", lerp(weapon_table[sec].hands_orientation[2], smoothed_values.hands_orientation_z, coeff), weapon_table[sec].hands_orientation[2], steps, delta),
 		}
 
+		local animation_progress = normalize(new_ori[1], weapon_table[sec].hands_orientation[1], max_deg)
+		callback("actor_on_weapon_tilting_back", wpn, animation_progress)
+
 		set_weapon_position(sec, new_pos, new_ori)
 
 		if scoped_weapon_zoomed then
-			if (get_console():get_bool("wpn_aim_toggle")) then
-				level.press_action(bind_to_dik(key_bindings.kWPN_ZOOM))
-			else
-				level.release_action(bind_to_dik(key_bindings.kWPN_ZOOM))
+
+			-- Calculate remaining time for scope aiming
+			local ms = delta / 1000
+			local t = 0
+			local threshold = 0.0007
+			smoothed_values.t = animation_progress
+
+			while t < weapon_table[sec].zoom_rotate_time and smoothed_values.t > threshold do
+				local k = smoothed_values.t ^ scope_magnitude
+				local steps = get_weapon_steps(wpn, sec) * k
+				local old = smoothed_values.t
+				smoothed_values.t = ema("t", 0, 0, steps, delta)
+				t = t + ms
+			end
+
+			local res = smoothed_values.t
+			smoothed_values.t = nil
+
+			if res > threshold then
+				if (get_console():get_bool("wpn_aim_toggle")) then
+					level.press_action(bind_to_dik(key_bindings.kWPN_ZOOM))
+				else
+					level.release_action(bind_to_dik(key_bindings.kWPN_ZOOM))
+				end
 			end
 		end
 
@@ -421,6 +444,7 @@ function soft_reset(wpn, sec, delta)
 		end
 
 		-- printf("soft reset complete")
+		-- printf("animation_progress %s", animation_progress)
 		reset(sec)
 	end
 end
@@ -679,8 +703,9 @@ function actor_on_update(binder, delta)
 
 	-- Adjust hud
 	enable_tilt(sec, wpn)
-	if coeff ~= 0 then
-		callback("actor_on_weapon_tilting", wpn, coeff)
+	local animation_progress = normalize(new_ori[1], weapon_table[sec].hands_orientation[1], max_deg)
+	if animation_progress > 0 then
+		callback("actor_on_weapon_tilting", wpn, animation_progress)
 	end
 	set_weapon_position(sec, new_pos, new_ori)
 end
