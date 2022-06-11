@@ -33,6 +33,9 @@
 	<string id="ui_mcm_weapon_cover_tilt_consider_silencer_desc">
 		<text>Weapons with attachable silencers when they are attached will have increased trigger radius by about 0.1 meters</text>
 	</string>
+	<string id="ui_mcm_weapon_cover_tilt_tilt_rattle">
+		<text>Rattle sound on tilting</text>
+	</string>
 	<string id="ui_mcm_weapon_cover_tilt_offset_x">
 		<text>Weapon position offset by X</text>
 	</string>
