@@ -78,6 +78,7 @@ jobs:
           BLIND=Weapon_Cover_Tilt_PATCH_Blindsides
           FIRE=Weapon_Cover_Tilt_PATCH_PP19_AUG_L96_Reanim
           SOUV=Weapon_Cover_Tilt_PATCH_Souvlakis_FAL
+          JADEY=Weapon_Cover_Tilt_PATCH_RPG-7_Reanim
           mkdir Weapon_Cover_Tilt_MAIN
           cp -R gamedata $MAIN
           mkdir -p $BAS/gamedata/scripts; mv $MAIN/gamedata/scripts/weapon_cover_tilt_positions_bas.script $_
@@ -85,7 +86,8 @@ jobs:
           mkdir -p $BLIND/gamedata/scripts; mv $MAIN/gamedata/scripts/weapon_cover_tilt_positions_blindsides.script $_
           mkdir -p $FIRE/gamedata/scripts; mv $MAIN/gamedata/scripts/weapon_cover_tilt_positions_firebreath.script $_
           mkdir -p $SOUV/gamedata/scripts; mv $MAIN/gamedata/scripts/weapon_cover_tilt_positions_souvlakis.script $_
-          zip -r 'Weapon_Cover_Tilt.zip' readme.txt $MAIN $BAS $FIRE $SOUV $AR_PACK $BLIND
+          mkdir -p $JADEY/gamedata/scripts; mv $MAIN/gamedata/scripts/weapon_cover_tilt_positions_jadey.script $_
+          zip -r 'Weapon_Cover_Tilt.zip' readme.txt $MAIN $BAS $FIRE $SOUV $AR_PACK $BLIND $JADEY
         env: 
           RELEASE_NAME_FULL: "Weapon_Cover_Tilt"
       
