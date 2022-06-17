@@ -13,6 +13,11 @@ op = {
     	{id = "offset_z", type = "track", val = 2, min = -0.5, max = 0.5, step = 0.005, def = 0},
     	{id = "yaw_variation", type = "track", val = 2, min = 0, max = 30, step = 1, def = 10},
     	{id = "roll_variation", type = "track", val = 2, min = 0, max = 30, step = 1, def = 10},
+
+        -- Keybinds
+        {id = "divider", type = "line" },
+        {id = "enable_manual_tilt", type = "check", val = 1, def = false},
+        {id = "manual_tilt_key_bind", type = "key_bind", val = 2, def = DIK_keys.DIK_COMMA},
     }
 }
 

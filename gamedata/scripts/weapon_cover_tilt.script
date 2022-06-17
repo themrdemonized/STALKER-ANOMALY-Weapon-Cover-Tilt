@@ -15,6 +15,8 @@ local try = try or function(func, ...)
 	end
 end
 
+local dte = demonized_time_events
+
 local normalize = normalize
 local clamp = clamp
 
@@ -737,7 +739,7 @@ function actor_on_weapon_zoom_out(obj)
 end
 
 function on_key_press(dik)
-	if dik == DIK_keys.DIK_LSHIFT then
+	if dik == settings.manual_tilt_key_bind then
 		tilt_key_pressed = not tilt_key_pressed
 	else
 		local bind = dik_to_bind(dik)
@@ -746,13 +748,32 @@ function on_key_press(dik)
 		if bind == kb.kWPN_ZOOM
 		or bind == kb.kWPN_FIRE
 		then
-			tilt_key_pressed = false
+			-- Postpone on next tick, needed to not fire on raised state
+			dte.CreateTimeEvent("tilt_key_pressed_postpone", 0, 0, function()
+				tilt_key_pressed = false
+				return true
+			end)
 		end
+	end
+end
+
+function actor_on_weapon_before_fire(flags)
+	if tilt_key_pressed then
+		tilt_key_pressed = false
+		flags.ret_value = false
 	end
 end
 
 function reset_settings()
 	load_settings()
+
+	if settings.enable_manual_tilt then
+		RegisterScriptCallback("on_key_press", on_key_press)
+	else
+		tilt_key_pressed = false
+		UnregisterScriptCallback("on_key_press", on_key_press)
+	end
+
 	if settings.enabled then
 		RegisterScriptCallback("actor_on_update", actor_on_update)
 	else
@@ -786,5 +807,6 @@ function on_game_start()
 	RegisterScriptCallback("actor_on_update", actor_on_update)
 	RegisterScriptCallback("actor_on_weapon_zoom_in", actor_on_weapon_zoom_in)
 	RegisterScriptCallback("actor_on_weapon_zoom_out", actor_on_weapon_zoom_out)
+	RegisterScriptCallback("actor_on_weapon_before_fire", actor_on_weapon_before_fire)
 	RegisterScriptCallback("on_key_press", on_key_press)
 end
