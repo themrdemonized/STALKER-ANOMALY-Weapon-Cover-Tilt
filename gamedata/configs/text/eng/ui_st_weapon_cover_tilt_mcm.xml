@@ -66,5 +66,12 @@
 	<string id="ui_mcm_weapon_cover_tilt_roll_variation_desc">
 		<text>When a weapon is raised, it will be randomly rolled by +- a given degree for more animation variation</text>
 	</string>
+
+	<string id="ui_mcm_weapon_cover_tilt_enable_manual_tilt">
+		<text>Enable Manual Tilt</text>
+	</string>
+	<string id="ui_mcm_weapon_cover_tilt_manual_tilt_key_bind">
+		<text>Manual Tilt Keybind</text>
+	</string>
 	
 </string_table>

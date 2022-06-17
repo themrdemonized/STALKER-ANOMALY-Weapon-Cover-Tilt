@@ -66,5 +66,12 @@
 	<string id="ui_mcm_weapon_cover_tilt_roll_variation_desc">
 		<text>При подъеме оружия, оно будет случайно крениться на +- заданный градус для большей вариативности анимаций</text>
 	</string>
+
+	<string id="ui_mcm_weapon_cover_tilt_enable_manual_tilt">
+		<text>Включить ручной подъем</text>
+	</string>
+	<string id="ui_mcm_weapon_cover_tilt_manual_tilt_key_bind">
+		<text>Клавиша подъема оружия</text>
+	</string>
 	
 </string_table>
