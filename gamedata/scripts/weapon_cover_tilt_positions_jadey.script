@@ -14,5 +14,8 @@ if weapon_cover_tilt_positions then
 		z = 0.05,
 		y = 0.32,
 	}
+	o["wpn_bizon"] = {
+		y = 0.2,
+	}
 
 end
