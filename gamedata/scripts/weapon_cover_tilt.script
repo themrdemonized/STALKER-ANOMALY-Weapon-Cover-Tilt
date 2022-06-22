@@ -283,6 +283,10 @@ local firepos_state = 0
 local yaw
 local roll
 
+function is_tilt_enabled()
+	return tilt_enabled
+end
+
 function randomize_roll_yaw()
 	if not yaw then
 		local max_yaw = settings.yaw_variation
