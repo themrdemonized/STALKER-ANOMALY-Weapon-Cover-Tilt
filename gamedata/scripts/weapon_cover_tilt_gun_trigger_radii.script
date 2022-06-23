@@ -5,7 +5,7 @@
 
 weapon_trigger_radii = {
 	["pri_a17_gauss_rifle"] = 0.2,
-	["wpn_9a91"] = -0.1,
+	["wpn_9a91"] = -0.15,
 	["wpn_ace21"] = -0.1,
 	["wpn_ak102"] = -0.1,
 	["wpn_ak104"] = -0.1,
@@ -114,10 +114,10 @@ weapon_trigger_radii = {
 	["wpn_ump45_custom"] = -0.1,
 	["wpn_vihr"] = -0.1,
 	["wpn_vssk"] = 0.1,
-	["wpn_vz61"] = -0.2,
-	["wpn_vz61_alt"] = -0.2,
-	["wpn_vz61_camo"] = -0.2,
-	["wpn_vz61_freedom"] = -0.2,
+	["wpn_vz61"] = -0.22,
+	["wpn_vz61_alt"] = -0.22,
+	["wpn_vz61_camo"] = -0.22,
+	["wpn_vz61_freedom"] = -0.22,
 	["wpn_wincheaster1300"] = -0.1,
 	["wpn_wincheaster1300_trapper"] = -0.1,
 }

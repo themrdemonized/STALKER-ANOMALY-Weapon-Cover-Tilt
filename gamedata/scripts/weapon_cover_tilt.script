@@ -695,12 +695,21 @@ function actor_on_update(binder, delta)
 		end
 
 		local max_dist = settings.trigger_radius
-		max_dist = (SYS_GetParam(0, sec, "kind", "") == "w_pistol" and max_dist - 0.34 or max_dist) + wpn_radii[sec]
 
-		-- Check if gun supports silencer and is attached, increase trigger radius
-		if settings.consider_silencer and isSilencedWeapon(wpn) then
-			max_dist = max_dist + 0.12
-		end
+		-- Adjust distance based on pistol or not
+		local dist_adjustment = (SYS_GetParam(0, sec, "kind", "") == "w_pistol" and -0.34 or 0) +
+		(
+			-- Adjust distance based on wpn_radii table
+			(wpn_radii[sec] or 0)
+
+			-- Adjust distance based on silenced weapon
+			+ (settings.consider_silencer and isSilencedWeapon(wpn) and 0.12 or 0)
+		)
+			-- Magnify the adjustment
+			* settings.trigger_radius_magnitude
+
+		-- Adjust the distance
+		max_dist = max_dist + dist_adjustment
 
 		-- Get target dist
 		local dist = max(0, get_target_dist() - 0.5)
