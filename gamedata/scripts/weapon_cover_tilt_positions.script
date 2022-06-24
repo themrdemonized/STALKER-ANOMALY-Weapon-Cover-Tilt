@@ -2,7 +2,7 @@
 -- How it works
 --   1. If weapon position is specified, use that, check exact section, weapon will be tilted there. Use if the gun is completely miss the mark during calculations and to speed up the process. Takes top priority
 --   2. If not 1, and If weapon offset is specified, use that, check exact section. Calculated position will be offseted by amount in the fields, useful if you need very small adjustments
---   Offsets are work this way:
+--   Offsets work this way:
 --	    x = 0.1 - will move the gun right, -0.1 left
 --	    y = 0.1 - will move the gun up, -0.1 down
 --	    z = 0.1 - will move the gun front, -0.1 back
