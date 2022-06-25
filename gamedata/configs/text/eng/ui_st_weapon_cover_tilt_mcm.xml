@@ -27,6 +27,12 @@
 	<string id="ui_mcm_weapon_cover_tilt_trigger_radius">
 		<text>Trigger radius in meters</text>
 	</string>
+	<string id="ui_mcm_weapon_cover_tilt_trigger_radius_magnitude">
+		<text>Weapon Length Modifier</text>
+	</string>
+	<string id="ui_mcm_weapon_cover_tilt_trigger_radius_magnitude_desc">
+		<text>This will change trigger radius dependency on weapon length, with more value, there will be more difference between short and long weapons</text>
+	</string>
 	<string id="ui_mcm_weapon_cover_tilt_consider_silencer">
 		<text>Consider attached silencers for trigger radius</text>
 	</string>

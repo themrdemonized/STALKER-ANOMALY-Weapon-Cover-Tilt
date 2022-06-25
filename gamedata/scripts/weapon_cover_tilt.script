@@ -181,19 +181,26 @@ local scoped_weapon_zoomed = false
 function isScopedWeapon(wpn)
 	if not wpn then return false end
 
-	local has_texture = SYS_GetParam(0, wpn:section(), "scopes_sect", "") ~= "" or SYS_GetParam(0, wpn:section(), "scope_texture", "") ~= ""
+	local has_scopes_sect = SYS_GetParam(0, wpn:section(), "scopes_sect", "") ~= ""
+	local has_texture = SYS_GetParam(0, wpn:section(), "scope_texture", "") ~= ""
 
-	-- If there is fixed scope or no scope defined, but also if there is a scope texture, it will use the texture for zoomin and considered a scoped weapon
-	if  (wpn:weapon_scope_status() == 1 or wpn:weapon_scope_status() == 0) and has_texture
-	then
-		return true
-	end
-
-	-- Usual check
 	local cobj = wpn:cast_Weapon()
-	if  (cobj and cobj:IsScopeAttached() or wpn:weapon_is_scope()) and has_texture 
-	then
-		return true
+
+	-- If old scopes system
+	if has_scopes_sect then
+		if cobj and cobj:IsScopeAttached() or wpn:weapon_is_scope() then
+			return true
+		end
+	else
+		-- If there is fixed scope or no scope defined, but also if there is a scope texture, it will use the texture for zoomin and considered a scoped weapon
+		if  (wpn:weapon_scope_status() == 1 or wpn:weapon_scope_status() == 0) and has_texture then
+			return true
+		end
+
+		-- Usual check
+		if  (cobj and cobj:IsScopeAttached() or wpn:weapon_is_scope()) and has_texture then
+			return true
+		end
 	end
 
 	return false
