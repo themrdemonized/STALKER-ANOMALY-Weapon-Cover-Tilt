@@ -213,22 +213,22 @@ if weapon_cover_tilt_positions then
 	-- 	y = 0.2,
 	-- }
 	o["wpn_scar_siber"] = {
-		y = 0.2,
+		y = 0.35,
 	}
 	o["wpn_scar_siber_black"] = {
-		y = 0.2,
+		y = 0.35,
 	}
 	o["wpn_scar_siber_m1"] = {
-		y = 0.2,
+		y = 0.35,
 	}
 	o["wpn_scar_siber_m1_black"] = {
-		y = 0.2,
+		y = 0.35,
 	}
 	o["wpn_scar_siber_m2"] = {
-		y = 0.2,
+		y = 0.35,
 	}
 	o["wpn_scar_siber_m2_custom"] = {
-		y = 0.2,
+		y = 0.35,
 	}
 	
 	-- o["wpn_sks_b"] = {
