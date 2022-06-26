@@ -197,7 +197,7 @@ if weapon_cover_tilt_positions then
 	-- 	y = 0.2,
 	-- }
 	o["wpn_rpk74_16"] = {
-		y = -0.1,
+		y = -0.05,
 		z = -0.15,
 	}
 	-- o["wpn_saiga12s_isg"] = {
