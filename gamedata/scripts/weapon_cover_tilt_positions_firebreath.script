@@ -31,10 +31,10 @@ if weapon_cover_tilt_positions then
 		y = 0.1,
 	}
 	o["wpn_l96a1"] = {
-		y = 0.1,
+		y = 0.2,
 	}
 	o["wpn_l96a1m"] = {
-		y = 0.1,
+		y = 0.2,
 	}
 	o["wpn_ump45"] = {
 		y = 0.35,
