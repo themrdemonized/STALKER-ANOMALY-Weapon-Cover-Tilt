@@ -275,12 +275,12 @@ local target_pos = {
 	hands_position_pistol = {
 		[0] = -0.050912,
 		[1] = -0.646908,
-		[2] = 0.310633,
+		[2] = 0.280633,
 	},
 	hands_position_rifle = {
 		[0] = 0.055224,
 		[1] = -0.6,
-		[2] = 0.122598,
+		[2] = 0.202598,
 	}
 }
 
@@ -472,7 +472,7 @@ end
 function calculate_new_position(wpn, sec, coeff, delta)
 	-- Calculate new position
 	local position_coeff_y = -0.445
-	local position_coeff_z = 0.485
+	local position_coeff_z = 0.565
 	local delta = delta or device().time_delta
 
 	-- Get steps depending on inv_weight, heavier guns have less movement speed
@@ -533,19 +533,19 @@ function calculate_new_position(wpn, sec, coeff, delta)
 			-- local a = {
 			-- 	[0] = weapon_table[sec].hands_position[0] + o[0] * coeff,
 			-- 	[1] = weapon_table[sec].hands_position[1] + (o[1] + position_coeff_y) * coeff,
-			-- 	[2] = weapon_table[sec].hands_position[2] + (o[2] + position_coeff_z) * coeff ^ 2,
+			-- 	[2] = weapon_table[sec].hands_position[2] + (o[2] + position_coeff_z) * coeff ^ 2.5,
 			-- }
 
 			local b = {
 				[0] = lerp(weapon_table[sec].hands_position[0], (o[0] + target_pos[0]), coeff),
 				[1] = lerp(weapon_table[sec].hands_position[1], (o[1] + target_pos[1]), coeff),
-				[2] = lerp(weapon_table[sec].hands_position[2], (o[2] + target_pos[2]), coeff ^ 2),
+				[2] = lerp(weapon_table[sec].hands_position[2], (o[2] + target_pos[2]), coeff ^ 2.5),
 			}
 
 			-- local c = {
 			-- 	[0] = lerp(b[0], b[0], coeff),
 			-- 	[1] = lerp(b[1], b[1], coeff),
-			-- 	[2] = lerp(b[2], b[2], coeff ^ 2),
+			-- 	[2] = lerp(b[2], b[2], coeff ^ 2.5),
 			-- }
 
 			new_pos = b
