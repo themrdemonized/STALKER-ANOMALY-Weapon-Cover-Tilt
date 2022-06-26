@@ -38,10 +38,10 @@ if weapon_cover_tilt_positions then
 	}
 	o["wpn_ump45"] = {
 		y = 0.35,
-		z = 0.15,
+		z = 0.07,
 	}
 	o["wpn_ump45_custom"] = {
 		y = 0.35,
-		z = 0.15,
+		z = 0.07,
 	}
 end

@@ -209,24 +209,24 @@ if weapon_cover_tilt_positions then
 	}
 
 	-- SMG
-	-- o["wpn_kiparis"] = {
-	-- 	y = 0.2,
-	-- }
-	o["wpn_vz61"] = {
+	o["wpn_kiparis"] = {
 		y = 0.05,
-		z = 0.05,
+	}
+	o["wpn_vz61"] = {
+		y = 0.07,
+		z = -0.03,
 	}
 	o["wpn_vz61_alt"] = {
-		y = 0.05,
-		z = 0.05,
+		y = 0.07,
+		z = -0.03,
 	}
 	o["wpn_vz61_camo"] = {
-		y = 0.05,
-		z = 0.05,
+		y = 0.07,
+		z = -0.03,
 	}
 	o["wpn_vz61_freedom"] = {
-		y = 0.05,
-		z = 0.05,
+		y = 0.07,
+		z = -0.03,
 	}
 
 	--Pistols
