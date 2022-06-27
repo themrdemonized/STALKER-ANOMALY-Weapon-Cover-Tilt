@@ -151,14 +151,14 @@ if weapon_cover_tilt_positions then
 	o["wpn_igi_ks23_ecolog"] = {
 		y = 0.2,
 	}
-	-- o["wpn_l85_m1"] = {
-	-- 	y = 0.2,
-	-- }
-	-- o["wpn_l85_m2"] = {
-	-- 	y = 0.2,
-	-- }
+	o["wpn_l85_m1"] = {
+		y = 0.075,
+	}
+	o["wpn_l85_m2"] = {
+		y = 0.075,
+	}
 	o["wpn_l85_m3"] = {
-		y = 0.2,
+		y = 0.3,
 	}
 	o["wpn_m4_butcher"] = {
 		y = 0.2,
