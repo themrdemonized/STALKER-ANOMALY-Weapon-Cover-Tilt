@@ -294,6 +294,10 @@ function is_tilt_enabled()
 	return tilt_enabled
 end
 
+function is_tilt_key_pressed()
+	return tilt_key_pressed
+end
+
 function randomize_roll_yaw()
 	if not yaw then
 		local max_yaw = settings.yaw_variation
@@ -829,4 +833,11 @@ function on_game_start()
 	RegisterScriptCallback("actor_on_weapon_zoom_out", actor_on_weapon_zoom_out)
 	RegisterScriptCallback("actor_on_weapon_before_fire", actor_on_weapon_before_fire)
 	RegisterScriptCallback("on_key_press", on_key_press)
+end
+
+-- Patches
+-- Safemode when weapon is raised manually
+actor_is_safemode = xr_conditions.actor_is_safemode
+xr_conditions.actor_is_safemode = function(actor, npc)
+	return actor_is_safemode(actor, npc) or (tilt_enabled and tilt_key_pressed)
 end
