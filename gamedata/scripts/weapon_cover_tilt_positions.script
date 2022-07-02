@@ -117,6 +117,9 @@ weapon_offsets = {
 	["wpn_mp5"] = {
 		y = 0.2,
 	},
+	["wpn_mp5_alt"] = {
+		y = 0.2,
+	},
 	["wpn_mp5_custom"] = {
 		y = 0.2,
 	},
