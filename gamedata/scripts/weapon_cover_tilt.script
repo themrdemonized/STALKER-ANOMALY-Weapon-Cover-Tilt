@@ -47,7 +47,10 @@ end
 
 local function lerp(a, b, f)
 	if (a and b and f) then
-		return (1 - f) * a + (f * b)
+		if f > 1 then
+			return a + f * (b - a)
+		end
+		return (1 - f) * a + f * b
 	else
 		return a or b or 0
 	end
@@ -214,7 +217,6 @@ function isSilencedWeapon(wpn)
 	and 	(cobj:IsSilencerAttached() or wpn:weapon_is_silencer() or utils_item.addon_attached(wpn, "sl"))
 end
 
-local max_deg = 75
 local random_funcs = demonized_randomizing_functions
 local wpn_positions = weapon_cover_tilt_positions or {}
 local wpn_radii = weapon_cover_tilt_gun_trigger_radii and weapon_cover_tilt_gun_trigger_radii.weapon_trigger_radii or {}
@@ -284,11 +286,32 @@ local target_pos = {
 	}
 }
 
+local custom_offsets = {
+	[0] = 0,
+	[1] = 0,
+	[2] = 0,
+}
+
+function set_custom_offsets(x, y, z)
+	custom_offsets[0] = x or 0
+	custom_offsets[1] = y or 0
+	custom_offsets[2] = z or 0
+end
+
 local tilt_enabled = false
 local tilt_key_pressed = false
 local firepos_state = 0
 local yaw
 local roll
+local max_deg = 75
+
+function set_yaw(deg)
+	yaw = deg
+end
+
+function set_roll(deg)
+	roll = deg
+end
 
 function is_tilt_enabled()
 	return tilt_enabled
@@ -473,7 +496,7 @@ function soft_reset(wpn, sec, delta)
 	end
 end
 
-function calculate_new_position(wpn, sec, coeff, delta)
+function calculate_new_position(wpn, sec, coeff, delta, steps)
 	-- Calculate new position
 	local position_coeff_y = -0.445
 	local position_coeff_z = 0.565
@@ -481,8 +504,10 @@ function calculate_new_position(wpn, sec, coeff, delta)
 
 	-- Get steps depending on inv_weight, heavier guns have less movement speed
 	-- k is modifier for ema steps to have more inertia in the beginning of movement
-	local k = max(1, 1.5 - sqrt(normalize(smoothed_values.hands_orientation_y or weapon_table[sec].hands_orientation[1], weapon_table[sec].hands_orientation[1], max_deg)))
-	local steps = get_weapon_steps(wpn, sec) * k
+	if not steps then
+		local k = max(1, 1.5 - sqrt(normalize(smoothed_values.hands_orientation_y or weapon_table[sec].hands_orientation[1], weapon_table[sec].hands_orientation[1], max_deg)))
+		steps = get_weapon_steps(wpn, sec) * k
+	end
 
 	-- Smooth the coeff
 	local coeff_smoothing = steps * 0.5
@@ -529,21 +554,21 @@ function calculate_new_position(wpn, sec, coeff, delta)
 		-- Different calculations for pistols
 		if is_pistol then
 			local target_pos = {
-				[0] = weapon_table[sec].hands_position[0] + settings.offset_x,
-				[1] = target_pos.hands_position_pistol[1] + settings.offset_y,
-				[2] = target_pos.hands_position_pistol[2] + settings.offset_z,
+				[0] = weapon_table[sec].hands_position[0] + settings.offset_x + custom_offsets[0],
+				[1] = target_pos.hands_position_pistol[1] + settings.offset_y + custom_offsets[1],
+				[2] = target_pos.hands_position_pistol[2] + settings.offset_z + custom_offsets[2],
 			}
 
 			-- local a = {
 			-- 	[0] = weapon_table[sec].hands_position[0] + o[0] * coeff,
 			-- 	[1] = weapon_table[sec].hands_position[1] + (o[1] + position_coeff_y) * coeff,
-			-- 	[2] = weapon_table[sec].hands_position[2] + (o[2] + position_coeff_z) * coeff ^ 2,
+			-- 	[2] = weapon_table[sec].hands_position[2] + (o[2] + position_coeff_z) * coeff >= 1 and coeff or coeff ^ 2,
 			-- }
 
 			local b = {
 				[0] = lerp(weapon_table[sec].hands_position[0], (o[0] + target_pos[0]), coeff),
 				[1] = lerp(weapon_table[sec].hands_position[1], (o[1] + target_pos[1]), coeff),
-				[2] = lerp(weapon_table[sec].hands_position[2], (o[2] + target_pos[2]), coeff ^ 2),
+				[2] = lerp(weapon_table[sec].hands_position[2], (o[2] + target_pos[2]), coeff >= 1 and coeff or coeff ^ 2),
 			}
 
 			-- local c = {
@@ -555,27 +580,27 @@ function calculate_new_position(wpn, sec, coeff, delta)
 			new_pos = b
 		else
 			local target_pos = {
-				[0] = weapon_table[sec].hands_position[0] + settings.offset_x,
-				[1] = target_pos.hands_position_rifle[1] + settings.offset_y,
-				[2] = target_pos.hands_position_rifle[2] + settings.offset_z,
+				[0] = weapon_table[sec].hands_position[0] + settings.offset_x + custom_offsets[0],
+				[1] = target_pos.hands_position_rifle[1] + settings.offset_y + custom_offsets[1],
+				[2] = target_pos.hands_position_rifle[2] + settings.offset_z + custom_offsets[2],
 			}
 
 			local a = {
 				[0] = weapon_table[sec].hands_position[0] + o[0] * coeff,
 				[1] = weapon_table[sec].hands_position[1] + (o[1] + position_coeff_y) * coeff,
-				[2] = weapon_table[sec].hands_position[2] + (o[2] + position_coeff_z) * coeff ^ 3.5,
+				[2] = weapon_table[sec].hands_position[2] + (o[2] + position_coeff_z) * (coeff >= 1 and coeff or coeff ^ 3.5),
 			}
 
 			local b = {
 				[0] = lerp(weapon_table[sec].hands_position[0], (o[0] + target_pos[0]), coeff),
 				[1] = lerp(weapon_table[sec].hands_position[1], (o[1] + target_pos[1]), coeff),
-				[2] = lerp(weapon_table[sec].hands_position[2], (o[2] + target_pos[2]), coeff ^ 3.5),
+				[2] = lerp(weapon_table[sec].hands_position[2], (o[2] + target_pos[2]), coeff >= 1 and coeff or coeff ^ 3.5),
 			}
 
 			local c = {
 				[0] = lerp(a[0], b[0], coeff),
 				[1] = lerp(a[1], b[1], coeff),
-				[2] = lerp(a[2], b[2], coeff ^ 3.5),
+				[2] = lerp(a[2], b[2], coeff >= 1 and coeff or coeff ^ 3.5),
 			}
 
 			new_pos = c
@@ -599,8 +624,15 @@ function calculate_new_position(wpn, sec, coeff, delta)
 	return new_pos, new_ori
 end
 
+local force_disabled = false
+function set_force_disabled(v)
+	force_disabled = v or v == nil
+end
+
 local reset_on_show_done = false
 function actor_on_update(binder, delta)
+	if force_disabled then return end
+
 	local actor = db.actor
 
 	-- Cancel if PDA is active
