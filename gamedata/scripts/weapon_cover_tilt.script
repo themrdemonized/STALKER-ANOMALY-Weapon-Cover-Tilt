@@ -45,6 +45,7 @@ local function ema(key, value, def, steps, delta)
 	return smoothed_values[key]
 end
 
+-- Linear inter/extrapolation
 local function lerp(a, b, f)
 	if a and b and f then
 		return a + f * (b - a)
