@@ -46,11 +46,8 @@ local function ema(key, value, def, steps, delta)
 end
 
 local function lerp(a, b, f)
-	if (a and b and f) then
-		if f > 1 then
-			return a + f * (b - a)
-		end
-		return (1 - f) * a + f * b
+	if a and b and f then
+		return a + f * (b - a)
 	else
 		return a or b or 0
 	end
@@ -398,7 +395,7 @@ function get_weapon_weight(wpn, sec)
 end
 
 function get_weapon_steps(wpn, sec)
-	return settings.animation_speed * (1 + get_weapon_weight(wpn, sec) * (settings.animation_weight_coeff * 0.07))
+	return settings.animation_speed * (1 + get_weapon_weight(wpn, sec) * settings.animation_weight_coeff * 0.07)
 end
 
 function set_weapon_position(sec, new_pos, new_ori)
