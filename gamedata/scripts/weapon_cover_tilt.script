@@ -246,7 +246,8 @@ not_pistol_sec = {
 }
 
 local weapon_table = {}
-function add_to_weapon_table(sec)
+function add_to_weapon_table(sec, force)
+	if weapon_table[sec] and not force then return end
 	weapon_table[sec] = {
 		hands_position = (function()
 			local hud_sec = SYS_GetParam(0, sec, "hud")
