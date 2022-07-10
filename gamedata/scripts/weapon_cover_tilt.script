@@ -2,6 +2,9 @@
 -- Makes weapon go up when near obstacle to emulate weapon dimensions 
 -- Written by demonized
 
+-- Current version
+VERSION = 9
+
 --Protected function call to prevent crashes to desktop
 --Prints error in console if occured, otherwise proceed normally
 --Use for test only, slower than usual
