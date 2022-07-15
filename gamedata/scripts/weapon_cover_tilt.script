@@ -181,6 +181,10 @@ function IsBinoc(sec)
 	or 		SYS_GetParam(0, sec, "class", "") == "WP_BINOC"
 end
 
+function IsThrowable(wpn)
+	return IsBolt(wpn) or SYS_GetParam(0, wpn:section(), "class", "") == "II_BOLT"
+end 
+
 local scoped_weapon_zoomed = false
 function isScopedWeapon(wpn)
 	if not wpn then return false end
@@ -394,7 +398,7 @@ end
 
 -- Get steps depending on inv_weight, heavier guns have less movement speed
 function get_weapon_weight(wpn, sec)
-	local cobj = wpn:cast_Weapon()
+	local cobj = wpn and wpn:cast_Weapon()
 	local weight = clamp(cobj and cobj:Weight() or (weapon_table[sec] and weapon_table[sec].inv_weight or 0), 0, 20)
 	return weight
 end
@@ -665,7 +669,7 @@ function actor_on_update(binder, delta)
 	end
 
 	-- Reset if throwable weapon (grenade, bolt)
-	if IsBolt(wpn) or IsGrenade(wpn) then
+	if IsBolt(wpn) or IsGrenade(wpn) or IsThrowable(wpn) then
 		return reset(sec)
 	end
 
