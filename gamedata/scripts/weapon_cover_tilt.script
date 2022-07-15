@@ -3,7 +3,7 @@
 -- Written by demonized
 
 -- Current version
-VERSION = 9
+VERSION = 10
 
 --Protected function call to prevent crashes to desktop
 --Prints error in console if occured, otherwise proceed normally
@@ -121,25 +121,27 @@ end
 
 local parameters = {
 -- Type: 0 = string | 1 = number | 2 = 3d vector | 3 = 4d vector | 
-	["hands_position"]		            = { name = "Hands Position",         typ = 2, def = {0,0,0}, indx = 1,  min = -180,   max = 180, step = 0.00001, idxa = 0, idxb = 0,  hud = true },
-	["hands_orientation"]	            = { name = "Hands Orientation",      typ = 2, def = {0,0,0}, indx = 2,  min = -180,   max = 180, step = 0.00001, idxa = 1, idxb = 0,  hud = true },
-	["aim_hud_offset_pos"]		        = { name = "Aim Position",           typ = 2, def = {0,0,0}, indx = 3,  min = -180,   max = 180, step = 0.00001, idxa = 0, idxb = 1,  hud = true },
-	["aim_hud_offset_rot"]	            = { name = "Aim Orientation",        typ = 2, def = {0,0,0}, indx = 4,  min = -180,   max = 180, step = 0.00001, idxa = 1, idxb = 1,  hud = true },
-	["gl_hud_offset_pos"]		        = { name = "GL Position",            typ = 2, def = {0,0,0}, indx = 5,  min = -180,   max = 180, step = 0.00001, idxa = 0, idxb = 2,  hud = true },
-	["gl_hud_offset_rot"]		        = { name = "GL Orientation",         typ = 2, def = {0,0,0}, indx = 6,  min = -180,   max = 180, step = 0.00001, idxa = 1, idxb = 2,  hud = true },
-	["aim_hud_offset_alt_pos"]	        = { name = "Alt Position",           typ = 2, def = {0,0,0}, indx = 7,  min = -180,   max = 180, step = 0.00001, idxa = 0, idxb = 3,  hud = true },
-	["aim_hud_offset_alt_rot"]			= { name = "Alt Orientation",        typ = 2, def = {0,0,0}, indx = 8,  min = -180,   max = 180, step = 0.00001, idxa = 1, idxb = 3,  hud = true },
-	["fire_point"]	        			= { name = "Fire Point",           	 typ = 2, def = {0,0,0}, indx = 9,  min = -180,   max = 180, step = 0.00001, idxa = 0, idxb = 10, hud = true, no_16x9 = true },
-	["fire_point2"]	       				= { name = "Fire Point 2",           typ = 2, def = {0,0,0}, indx = 10, min = -180,   max = 180, step = 0.00001, idxa = 0, idxb = 11, hud = true, no_16x9 = true },
-	["fire_direction"]					= { name = "Fire Direction",         typ = 2, def = {0,0,1}, indx = 11, min = -180,   max = 180, step = 0.00001, idxa = 1, idxb = 10, hud = true, no_16x9 = true },
-	["shell_point"]						= { name = "Shell Point",        	 typ = 2, def = {0,0,0}, indx = 12, min = -180,   max = 180, step = 0.00001, idxa = 1, idxb = 11, hud = true, no_16x9 = true },
-	["custom_ui_pos"]	       		 	= { name = "UI Position",            typ = 2, def = {0,0,0}, indx = 13, min = -180,   max = 180, step = 0.00001, idxa = 0, idxb = 20 }, --idxb 20 is reserved for device ui
-	["custom_ui_rot"]					= { name = "UI Orientation",         typ = 2, def = {0,0,0}, indx = 14, min = -180,   max = 180, step = 1, 		 idxa = 1, idxb = 20 },
-	["lowered_hud_offset_pos"]			= { name = "Lowered Position",       typ = 2, def = {0,0,0}, indx = 15, min = -180,   max = 180, step = 0.00001, idxa = 0, idxb = 4,  hud = true },
-	["lowered_hud_offset_rot"]			= { name = "Lowered Orientation",    typ = 2, def = {0,0,0}, indx = 16, min = -180,   max = 180, step = 0.00001, idxa = 1, idxb = 4,  hud = true },
-	["scope_zoom_factor"]				= { name = "Zoom Factor",        	 typ = 1, def = 0, 		 indx = 17, min = 0,  	  max = 120, step = 0.1 },
-	["gl_zoom_factor"]					= { name = "GL Zoom Factor",         typ = 1, def = 0, 		 indx = 18, min = 0,  	  max = 120, step = 0.1 },
-	["scope_zoom_factor_alt"]			= { name = "Alt Zoom Factor",        typ = 1, def = 0, 		 indx = 19, min = 0,  	  max = 120, step = 0.1 }, 
+	["hands_position"]		            = { name = "Hands Position",         typ = 2, def = {0,0,0}, indx = 1,  min = -180,   max = 180, step = 0.0001, idxa = 0, idxb = 0,  hud = true },
+	["hands_orientation"]	            = { name = "Hands Orientation",      typ = 2, def = {0,0,0}, indx = 2,  min = -180,   max = 180, step = 0.0001, idxa = 1, idxb = 0,  hud = true },
+	["aim_hud_offset_pos"]		        = { name = "Aim Position",           typ = 2, def = {0,0,0}, indx = 3,  min = -180,   max = 180, step = 0.0001, idxa = 0, idxb = 1,  hud = true },
+	["aim_hud_offset_rot"]	            = { name = "Aim Orientation",        typ = 2, def = {0,0,0}, indx = 4,  min = -180,   max = 180, step = 0.0001, idxa = 1, idxb = 1,  hud = true },
+	["gl_hud_offset_pos"]		        = { name = "GL Position",            typ = 2, def = {0,0,0}, indx = 5,  min = -180,   max = 180, step = 0.0001, idxa = 0, idxb = 2,  hud = true },
+	["gl_hud_offset_rot"]		        = { name = "GL Orientation",         typ = 2, def = {0,0,0}, indx = 6,  min = -180,   max = 180, step = 0.0001, idxa = 1, idxb = 2,  hud = true },
+	["aim_hud_offset_alt_pos"]	        = { name = "Alt Position",           typ = 2, def = {0,0,0}, indx = 7,  min = -180,   max = 180, step = 0.0001, idxa = 0, idxb = 3,  hud = true },
+	["aim_hud_offset_alt_rot"]			= { name = "Alt Orientation",        typ = 2, def = {0,0,0}, indx = 8,  min = -180,   max = 180, step = 0.0001, idxa = 1, idxb = 3,  hud = true },
+	["lowered_hud_offset_pos"]			= { name = "Lowered Position",       typ = 2, def = {0,0,0}, indx = 9,  min = -180,   max = 180, step = 0.0001, idxa = 0, idxb = 4,  hud = true },
+	["lowered_hud_offset_rot"]			= { name = "Lowered Orientation",    typ = 2, def = {0,0,0}, indx = 10, min = -180,   max = 180, step = 0.0001, idxa = 1, idxb = 4,  hud = true },
+	["fire_point"]	        			= { name = "Fire Point",           	 typ = 2, def = {0,0,0}, indx = 11, min = -180,   max = 180, step = 0.0001, idxa = 0, idxb = 10, hud = true, no_16x9 = true },
+	["fire_point2"]	       				= { name = "Fire Point 2",           typ = 2, def = {0,0,0}, indx = 12, min = -180,   max = 180, step = 0.0001, idxa = 0, idxb = 11, hud = true, no_16x9 = true },
+	["fire_direction"]					= { name = "Fire Direction",         typ = 2, def = {0,0,1}, indx = 13, min = -180,   max = 180, step = 0.0001, idxa = 1, idxb = 10, hud = true, no_16x9 = true },
+	["shell_point"]						= { name = "Shell Point",        	 typ = 2, def = {0,0,0}, indx = 14, min = -180,   max = 180, step = 0.0001, idxa = 1, idxb = 11, hud = true, no_16x9 = true },
+	["custom_ui_pos"]	       		 	= { name = "UI Position",            typ = 2, def = {0,0,0}, indx = 15, min = -180,   max = 180, step = 0.0001, idxa = 0, idxb = 20 }, --idxb 20 is reserved for device ui
+	["custom_ui_rot"]					= { name = "UI Orientation",         typ = 2, def = {0,0,0}, indx = 16, min = -180,   max = 180, step = 1, 		 idxa = 1, idxb = 20 },
+	["item_position"]	        		= { name = "Item Position",          typ = 2, def = {0,0,0}, indx = 17, min = -180,   max = 180, step = 0.0001, idxa = 0, idxb = 12, hud = true, no_16x9 = true },
+	["item_orientation"]	       		= { name = "Item Orientation",       typ = 2, def = {0,0,0}, indx = 18, min = -180,   max = 180, step = 0.0001, idxa = 1, idxb = 12, hud = true, no_16x9 = true },
+	["scope_zoom_factor"]				= { name = "Zoom Factor",        	 typ = 1, def = 0, 		 indx = 19, min = 0,  	  max = 120, step = 0.1 },
+	["gl_zoom_factor"]					= { name = "GL Zoom Factor",         typ = 1, def = 0, 		 indx = 20, min = 0,  	  max = 120, step = 0.1 },
+	["scope_zoom_factor_alt"]			= { name = "Alt Zoom Factor",        typ = 1, def = 0, 		 indx = 21, min = 0,  	  max = 120, step = 0.1 }, 
 }
 
 function reset_wpn_hud(sec)
