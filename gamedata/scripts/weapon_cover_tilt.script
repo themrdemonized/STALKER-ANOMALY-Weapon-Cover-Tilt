@@ -881,3 +881,10 @@ actor_is_safemode = xr_conditions.actor_is_safemode
 xr_conditions.actor_is_safemode = function(actor, npc)
 	return actor_is_safemode(actor, npc) or (tilt_enabled and tilt_key_pressed)
 end
+
+function muzzle_pos()
+	local item = db.actor:active_item()
+	if not item then return end
+	local pos = utils_obj.safe_bone_pos(item, "muzzle")
+	return game.world2ui(pos, true)
+end
