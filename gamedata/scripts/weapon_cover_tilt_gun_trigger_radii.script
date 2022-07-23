@@ -16,6 +16,7 @@ weapon_trigger_radii = {
 	["wpn_ak74u_old"] = -0.1,
 	["wpn_ak74u_snag"] = -0.1,
 	["wpn_ak74m_beard"] = 0.1,
+	["wpn_arisaka"] = 0.1,
 	["wpn_aug"] = -0.1,
 	["wpn_aug_custom"] = -0.1,
 	["wpn_aug_freedom"] = -0.1,

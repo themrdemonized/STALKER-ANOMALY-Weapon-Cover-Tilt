@@ -199,4 +199,8 @@ weapon_offsets = {
 	["wpn_mk48"] = {
 		z = 0.07,
 	},
+
+	["wpn_arisaka"] = {
+		y = 0.275,
+	},
 }

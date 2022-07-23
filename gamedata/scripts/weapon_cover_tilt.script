@@ -221,7 +221,7 @@ function isSilencedWeapon(wpn)
 
 	local cobj = wpn:cast_Weapon()
 	return 	wpn:weapon_silencer_status() == 2
-	and 	(cobj:IsSilencerAttached() or wpn:weapon_is_silencer() or utils_item.addon_attached(wpn, "sl"))
+	and 	(cobj and cobj:IsSilencerAttached() or wpn:weapon_is_silencer() or utils_item.addon_attached(wpn, "sl"))
 end
 
 local random_funcs = demonized_randomizing_functions
@@ -644,7 +644,7 @@ function actor_on_update(binder, delta)
 	local actor = db.actor
 
 	-- Cancel if PDA is active
-	if actor:active_slot() == 8 then
+	if actor:active_slot() == 8 or actor:active_slot() == 14 then
 		return reset()
 	end
 
