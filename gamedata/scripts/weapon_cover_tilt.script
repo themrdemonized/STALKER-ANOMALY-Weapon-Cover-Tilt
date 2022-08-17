@@ -3,7 +3,7 @@
 -- Written by demonized
 
 -- Current version
-VERSION = 10
+VERSION = 11
 
 --Protected function call to prevent crashes to desktop
 --Prints error in console if occured, otherwise proceed normally
