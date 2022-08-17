@@ -365,8 +365,15 @@ function isShootableMaterial(max_dist)
 	-- printf("%s, material_shoot_factor %s", name, shoot_factor)
 
 	-- If name contains "bush" or material is shootable and low shoot_factor - true 
+	if string.find(name, "bush") then
+		return true
+	end
+
+	if string.find(name, "water") then
+		return false
+	end
+
 	if false
-	or string.find(name, "bush")
 	or (flags_test_result.flShootable and shoot_factor <= 0.01)
 	then
 		return true
