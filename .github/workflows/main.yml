@@ -75,6 +75,7 @@ jobs:
         run: |
           MAIN=Weapon_Cover_Tilt_MAIN
           BAS=Weapon_Cover_Tilt_PATCH_BaS
+          BAS_NEW=Weapon_Cover_Tilt_PATCH_BaS_Update
           AR_PACK=Weapon_Cover_Tilt_PATCH_AR_Pack
           BLIND=Weapon_Cover_Tilt_PATCH_Blindsides
           FIRE=Weapon_Cover_Tilt_PATCH_PP19_AUG_L96_Reanim
@@ -83,6 +84,7 @@ jobs:
           mkdir Weapon_Cover_Tilt_MAIN
           cp -R gamedata $MAIN
           mkdir -p $BAS/gamedata/scripts; mv $MAIN/gamedata/scripts/weapon_cover_tilt_positions_bas.script $_
+          mkdir -p $BAS_NEW/gamedata/scripts; mv $MAIN/gamedata/scripts/weapon_cover_tilt_positions_bas_new.script $_
           mkdir -p $AR_PACK/gamedata/scripts; mv $MAIN/gamedata/scripts/weapon_cover_tilt_positions_ar_pack.script $_
           mkdir -p $BLIND/gamedata/scripts; mv $MAIN/gamedata/scripts/weapon_cover_tilt_positions_blindsides.script $_
           mkdir -p $FIRE/gamedata/scripts; mv $MAIN/gamedata/scripts/weapon_cover_tilt_positions_firebreath.script $_
