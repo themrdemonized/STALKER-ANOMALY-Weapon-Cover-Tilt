@@ -54,6 +54,7 @@ weapon_offsets = {
 	},
 	["wpn_9a91"] = {
 		y = 0.03,
+		z = 0.06,
 	},
 	["wpn_vsk94"] = {
 		y = 0.03,
@@ -138,6 +139,81 @@ weapon_offsets = {
 	["wpn_mp5sd_new"] = {
 		y = 0.05,
 		z = 0.07,
+	},
+
+	["wpn_mp7"] = {
+		y = 0.15,
+		z = 0.05,
+	},
+
+	["wpn_aug"] = {
+		z = 0.06,
+	},
+	["wpn_aug_custom"] = {
+		z = 0.06,
+	},
+	["wpn_aug_freedom"] = {
+		z = 0.06,
+	},
+	["wpn_aug_modern"] = {
+		z = 0.06,
+	},
+	["wpn_aug_merc"] = {
+		z = 0.06,
+	},
+
+	["wpn_l85"] = {
+		z = 0.06,
+	},
+	["wpn_l85_alt"] = {
+		z = 0.06,
+	},
+	["wpn_l85_custom"] = {
+		z = 0.06,
+	},
+	["wpn_l85_modern"] = {
+		z = 0.06,
+	},
+
+	["wpn_l85a2"] = {
+		z = 0.06,
+	},
+	["wpn_l85a2_alt"] = {
+		z = 0.06,
+	},
+	["wpn_l85a2_custom"] = {
+		z = 0.06,
+	},
+	["wpn_l85a2_modern"] = {
+		z = 0.06,
+	},
+
+	["wpn_remington870"] = {
+		y = 0.2,
+	},
+
+	["wpn_mp133"] = {
+		y = 0.2,
+	},
+
+	["wpn_vssk"] = {
+		z = 0.125,
+		y = 0.125,
+	},
+	["wpn_ash12"] = {
+		z = 0.125,
+		y = 0.125,
+	},
+
+	["wpn_svt40"] = {
+		y = 0.15,
+	},
+	["wpn_svt40_modern"] = {
+		y = 0.15,
+	},	
+
+	["wpn_ak105"] = {
+		y = 0.25,
 	},
 
 	["wpn_p90"] = {
