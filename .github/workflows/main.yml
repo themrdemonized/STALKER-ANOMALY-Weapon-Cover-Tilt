@@ -90,7 +90,7 @@ jobs:
           mkdir -p $FIRE/gamedata/scripts; mv $MAIN/gamedata/scripts/weapon_cover_tilt_positions_firebreath.script $_
           mkdir -p $SOUV/gamedata/scripts; mv $MAIN/gamedata/scripts/weapon_cover_tilt_positions_souvlakis.script $_
           mkdir -p $JADEY/gamedata/scripts; mv $MAIN/gamedata/scripts/weapon_cover_tilt_positions_jadey.script $_
-          zip -r 'Weapon_Cover_Tilt.zip' readme.txt $MAIN $BAS $FIRE $SOUV $AR_PACK $BLIND $JADEY
+          zip -r 'Weapon_Cover_Tilt.zip' readme.txt $MAIN $BAS $BAS_NEW $FIRE $SOUV $AR_PACK $BLIND $JADEY
         env: 
           RELEASE_NAME_FULL: "Weapon_Cover_Tilt"
       
