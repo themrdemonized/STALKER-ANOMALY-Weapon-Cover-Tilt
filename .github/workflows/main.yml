@@ -74,6 +74,7 @@ jobs:
       - name: Zip folder
         run: |
           MAIN=Weapon_Cover_Tilt_MAIN
+          AWAR=Weapon_Cover_Tilt_PATCH_AWAR
           BAS=Weapon_Cover_Tilt_PATCH_BaS
           BAS_NEW=Weapon_Cover_Tilt_PATCH_BaS_Update
           AR_PACK=Weapon_Cover_Tilt_PATCH_AR_Pack
@@ -83,6 +84,7 @@ jobs:
           JADEY=Weapon_Cover_Tilt_PATCH_RPG-7_Bizon_Reanim
           mkdir Weapon_Cover_Tilt_MAIN
           cp -R gamedata $MAIN
+          mkdir -p $AWAR/gamedata/scripts; mv $MAIN/gamedata/scripts/weapon_cover_tilt_positions_awar.script $_
           mkdir -p $BAS/gamedata/scripts; mv $MAIN/gamedata/scripts/weapon_cover_tilt_positions_bas.script $_
           mkdir -p $BAS_NEW/gamedata/scripts; mv $MAIN/gamedata/scripts/weapon_cover_tilt_positions_bas_new.script $_
           mkdir -p $AR_PACK/gamedata/scripts; mv $MAIN/gamedata/scripts/weapon_cover_tilt_positions_ar_pack.script $_
@@ -90,7 +92,7 @@ jobs:
           mkdir -p $FIRE/gamedata/scripts; mv $MAIN/gamedata/scripts/weapon_cover_tilt_positions_firebreath.script $_
           mkdir -p $SOUV/gamedata/scripts; mv $MAIN/gamedata/scripts/weapon_cover_tilt_positions_souvlakis.script $_
           mkdir -p $JADEY/gamedata/scripts; mv $MAIN/gamedata/scripts/weapon_cover_tilt_positions_jadey.script $_
-          zip -r 'Weapon_Cover_Tilt.zip' readme.txt $MAIN $BAS $BAS_NEW $FIRE $SOUV $AR_PACK $BLIND $JADEY
+          zip -r 'Weapon_Cover_Tilt.zip' readme.txt $MAIN $AWAR $BAS $BAS_NEW $FIRE $SOUV $AR_PACK $BLIND $JADEY
         env: 
           RELEASE_NAME_FULL: "Weapon_Cover_Tilt"
       
