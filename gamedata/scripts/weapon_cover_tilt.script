@@ -883,7 +883,7 @@ function actor_on_update(binder, delta)
 		local max_dist = settings.trigger_radius
 
 		-- Adjust distance based on pistol or not
-		local dist_adjustment = (SYS_GetParam(0, sec, "kind", "") == "w_pistol" and -0.34 or 0) +
+		local dist_adjustment = (SYS_GetParam(0, sec, "kind", "") == "w_pistol" and -0.3 or 0) +
 		(
 			-- Adjust distance based on wpn_radii table
 			(wpn_radii[sec] or 0)
