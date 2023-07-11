@@ -1,7 +1,6 @@
 -- Table of weapons that have adjusted trigger radius for animation
 -- Having value > 0 will increase the trigger radius
 -- Having value < 0 will decrease the trigger radius
--- Pistols automatically have reduced radius (value about -0.3), adding it to them might reduce it even more or cancel the reduction
 
 weapon_trigger_radii = {
 	["pri_a17_gauss_rifle"] = 0.2,

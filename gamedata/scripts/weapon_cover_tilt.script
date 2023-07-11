@@ -3,7 +3,7 @@
 -- Written by demonized
 
 -- Current version
-VERSION = 11
+VERSION = 14
 
 --Protected function call to prevent crashes to desktop
 --Prints error in console if occured, otherwise proceed normally
@@ -374,7 +374,7 @@ function isShootableMaterial(max_dist)
 	end
 
 	if false
-	or (flags_test_result.flShootable and shoot_factor <= 0.01)
+	-- or (flags_test_result.flShootable and shoot_factor <= 0.01)
 	then
 		return true
 	end
@@ -387,6 +387,15 @@ not_pistol_sec = {
 	wpn_svt40_short = true,
 	wpn_avt40_short = true,
 	wpn_aek919k = true,
+}
+
+-- Adjust gun radii by kind if cant find section in radii table
+wpn_kind_adjustment_table = {
+	w_pistol = -0.3,
+	w_smg = -0.12,
+	w_sniper = 0.12,
+	w_shotgun = -0.05,
+	w_rifle = 0,
 }
 
 local weapon_table = {}
@@ -447,6 +456,8 @@ local firepos_state = 0
 local yaw
 local roll
 local max_deg = 75
+local grace_threshold = 75
+local grace_time = 0
 
 function set_yaw(deg)
 	yaw = deg
@@ -529,6 +540,7 @@ function reset(sec)
 		smoothed_values.coeff = nil
 		tilt_enabled = false
 		tilt_key_pressed = false
+		grace_time = 0
 		callback("actor_on_weapon_tilt_end", wpn)
 	end
 end
@@ -874,7 +886,13 @@ function actor_on_update(binder, delta)
 				end
 			end
 
-			-- Add table with 0 offsets if no weapon offset found
+			-- Adjust by weapon kind
+			if not wpn_radii[sec] then
+				local wpn_kind = SYS_GetParam(0, sec, "kind", "")
+				local wpn_kind_adjustment = wpn_kind_adjustment_table[wpn_kind] or 0
+				wpn_radii[sec] = wpn_kind_adjustment
+			end
+
 			if not wpn_radii[sec] then
 				wpn_radii[sec] = 0
 			end
@@ -882,9 +900,8 @@ function actor_on_update(binder, delta)
 
 		local max_dist = settings.trigger_radius
 
-		-- Adjust distance based on pistol or not
-		local dist_adjustment = (SYS_GetParam(0, sec, "kind", "") == "w_pistol" and -0.3 or 0) +
-		(
+		-- Adjust distance
+		local dist_adjustment = (
 			-- Adjust distance based on wpn_radii table
 			(wpn_radii[sec] or 0)
 
@@ -916,6 +933,12 @@ function actor_on_update(binder, delta)
 		if isShootableMaterial() then
 			return soft_reset(wpn, sec, delta)
 		end
+
+		-- Don't raise before grace time expired
+		-- if grace_time < grace_threshold then
+		-- 	grace_time = grace_time + device().time_delta
+		-- 	return
+		-- end
 
 		-- Apply non linear coefficient
 		local coeff = random_funcs.CircularEaseOutPowered(1 - dist / max_dist, 0.65)
