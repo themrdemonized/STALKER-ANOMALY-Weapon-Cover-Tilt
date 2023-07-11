@@ -1051,3 +1051,4 @@ function muzzle_pos()
 	local pos = utils_obj.safe_bone_pos(item, "muzzle")
 	return game.world2ui(pos, true)
 end
+
