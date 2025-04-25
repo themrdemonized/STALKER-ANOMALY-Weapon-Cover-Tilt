@@ -12,6 +12,15 @@
 	<string id="ui_mcm_weapon_cover_tilt_enabled">
 		<text>Enable</text>
 	</string>
+	<string id="ui_mcm_weapon_cover_tilt_use_fire_bone">
+		<text>Use HUD model dimensions</text>
+	</string>
+	<string id="ui_mcm_weapon_cover_tilt_use_fire_bone_desc">
+		<text>When enabled, the actual HUD model dimensions will determine when weapon will be tilted. WCT will perform raycast from fire_bone bone and its fire_point offset in firing direction. REQUIRES MODDED EXES >= 2025.04.22. Default method will be used if new one isn't available</text>
+	</string>
+	<string id="ui_mcm_weapon_cover_tilt_use_fire_bone_debug">
+		<text>Use HUD model dimensions debug</text>
+	</string>
 	<string id="ui_mcm_weapon_cover_tilt_animation_speed">
 		<text>Animation inertia</text>
 	</string>

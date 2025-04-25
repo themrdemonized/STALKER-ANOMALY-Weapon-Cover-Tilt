@@ -3,22 +3,11 @@
 -- Written by demonized
 
 -- Current version
-VERSION = 14
-
---Protected function call to prevent crashes to desktop
---Prints error in console if occured, otherwise proceed normally
---Use for test only, slower than usual
-local try = try or function(func, ...)
-	local status, error_or_result = pcall(func, ...)
-	if not status then
-		printf(error_or_result)
-		return false, status, error_or_result
-	else
-		return error_or_result, status
-	end
-end
+VERSION = 15
 
 local dte = demonized_time_events
+local dgr = demonized_geometry_ray
+
 
 local normalize = normalize
 local clamp = clamp
@@ -32,6 +21,52 @@ local actor_weapon_lowered = game.actor_weapon_lowered
 
 local get_target_dist = level.get_target_dist
 local get_target_obj = level.get_target_obj
+
+local current_weapon_sec = ""
+local saved_variables = {}
+local saved_time
+
+local function reset_saved_vars()
+	empty_table(saved_variables)
+end
+
+local gizmosInitialized = false
+local gizmos = {}
+local id = 71000
+local idOffset = 0
+
+function initializeGizmos()
+	if gizmosInitialized then return end
+	gizmosInitialized = true
+
+	gizmos.fireBoneSphere = debug_render.add_object(id + idOffset, DBG_ScriptObject.sphere):cast_dbg_sphere()
+	idOffset = idOffset + 1
+
+	gizmos.fireBoneSphereAdjusted = debug_render.add_object(id + idOffset, DBG_ScriptObject.sphere):cast_dbg_sphere()
+	idOffset = idOffset + 1
+
+	gizmos.fireBoneSphereReal = debug_render.add_object(id + idOffset, DBG_ScriptObject.sphere):cast_dbg_sphere()
+	idOffset = idOffset + 1
+
+	gizmos.collisionLine = debug_render.add_object(id + idOffset, DBG_ScriptObject.line):cast_dbg_line()
+	idOffset = idOffset + 1
+
+	gizmos.debugLine1 = debug_render.add_object(id + idOffset, DBG_ScriptObject.line):cast_dbg_line()
+	idOffset = idOffset + 1
+end
+
+function disableGizmos()
+	for k, v in pairs(gizmos) do
+		if type(v) == "table" then
+			for i = 1, #v do
+				local p = v[i]
+				p.visible = false
+			end
+		else
+			v.visible = false
+		end
+	end	
+end
 
 --EMA smoothing for changing values, frame independent
 local default_smoothing = 11.5
@@ -115,6 +150,15 @@ function get_setting(key)
 	return settings[key]
 end
 
+
+function toggleDebugMode()
+	if settings.use_fire_bone_debug then
+		initializeGizmos()
+	else
+		disableGizmos()
+	end
+end
+
 function debug_enabled()
 	return DEV_DEBUG or DEV_DEBUG_DEV
 end
@@ -141,8 +185,13 @@ local parameters = {
 	["item_orientation"]	       		= { name = "Item Orientation",       typ = 2, def = {0,0,0}, indx = 18, min = -180,   max = 180, step = 0.0001, idxa = 1, idxb = 12, hud = true, no_16x9 = true },
 	["scope_zoom_factor"]				= { name = "Zoom Factor",        	 typ = 1, def = 0, 		 indx = 19, min = 0,  	  max = 120, step = 0.1 },
 	["gl_zoom_factor"]					= { name = "GL Zoom Factor",         typ = 1, def = 0, 		 indx = 20, min = 0,  	  max = 120, step = 0.1 },
-	["scope_zoom_factor_alt"]			= { name = "Alt Zoom Factor",        typ = 1, def = 0, 		 indx = 21, min = 0,  	  max = 120, step = 0.1 }, 
+	["scope_zoom_factor_alt"]			= { name = "Alt Zoom Factor",        typ = 1, def = 0, 		 indx = 21, min = 0,  	  max = 120, step = 0.1 },
 }
+
+if MODDED_EXES_VERSION >= 20240412 then
+	parameters["base_hud_offset_pos"]	= { name = "Base Position Offset",   typ = 2, def = {0,0,0}, indx = 22,  min = -180,   max = 180, step = 0.0001, idxa = 0, idxb = 5,  hud = true }
+	parameters["base_hud_offset_rot"]	= { name = "base Rotation Offset",   typ = 2, def = {0,0,0}, indx = 23,  min = -180,   max = 180, step = 0.0001, idxa = 1, idxb = 5,  hud = true }
+end
 
 function reset_wpn_hud(sec)
 	local hud_sec = SYS_GetParam(0, sec, "hud")
@@ -227,6 +276,7 @@ end
 local random_funcs = demonized_randomizing_functions
 local wpn_positions = weapon_cover_tilt_positions or {}
 local wpn_radii = weapon_cover_tilt_gun_trigger_radii and weapon_cover_tilt_gun_trigger_radii.weapon_trigger_radii or {}
+local wpn_radii_fire_bone = weapon_cover_tilt_gun_trigger_radii_fire_bone and weapon_cover_tilt_gun_trigger_radii_fire_bone.weapon_trigger_radii or {}
 
 function getBestMatch(sec)
 	local best_match, best_match_l = nil, 0
@@ -914,9 +964,172 @@ function actor_on_update(binder, delta)
 		-- Adjust the distance
 		max_dist = max_dist + dist_adjustment
 
-		-- Get target dist
 		local dist = max(0, get_target_dist() - 0.5)
-		-- printf("target_dist %s", dist)
+
+		if wpn:section() ~= current_weapon_sec then
+			current_weapon_sec = wpn:section()
+			reset_saved_vars()
+			saved_time = time_global()
+		end
+
+		if settings.use_fire_bone and MODDED_EXES_VERSION >= 20250422 then
+			local timeout = 1500
+
+			-- Get fire point bone position where barrel end resides
+			local fire_bone = SYS_GetParam(0, hud_sec, "fire_bone", "wpn_body")
+			local offset = SYS_GetParam(0, hud_sec, "fire_point", "0,0,0")
+			if isSilencedWeapon(wpn) then
+				fire_bone = SYS_GetParam(0, hud_sec, "fire_bone_silencer", fire_bone)
+				offset = SYS_GetParam(0, hud_sec, "fire_point_silencer", offset)
+			end
+			offset = utils_data.string_to_vector(offset)
+			local pos = wpn:bone_position(fire_bone, true)
+			local mat = wpn:bone_transform(fire_bone, true)
+			mat:transform_tiny(pos, offset)
+			pos:hud_to_world()
+
+			-- Get fire direction
+			local fire_dir = utils_data.string_to_vector(SYS_GetParam(0, hud_sec, "fire_direction", "0,0,1"))
+			local item_transform = wpn:xform(true)
+			item_transform:transform_dir(fire_dir)
+			fire_dir:normalize()
+
+			local fire_particles_mat = matrix():identity()
+
+			-- Do it like that
+			local fp_i = fire_particles_mat.i
+			local fp_j = fire_particles_mat.j
+			local fp_k = fire_particles_mat.k
+			fp_k:set(fire_dir)
+
+			vector.generate_orthonormal_basis_normalized(fp_k, fp_j, fp_i)
+			fire_dir:set(fp_k)
+
+			-- If fire_dir looks opposite to device().cam_dir, invert it
+			if fire_dir:dotproduct(device().cam_dir) < 0 then
+				fire_dir:invert()
+			end
+
+			-- Adjust for silencer
+			if settings.consider_silencer and isSilencedWeapon(wpn) and not (SYS_GetParam(0, hud_sec, "fire_bone_silencer") or SYS_GetParam(0, hud_sec, "fire_point_silencer")) then
+				pos:mad(fire_dir, 0.12)
+			end
+
+			-- Adjust from trigger_radii table
+			if wpn_radii_fire_bone[wpn:section()] then
+				pos:mad(fire_dir, wpn_radii_fire_bone[wpn:section()])
+			end
+
+			saved_variables.bone_pos = vector():set(pos)
+
+			-- If position is too close to device().cam_pos, adjust it in opposite direction
+			if vector():set(pos):sub(device().cam_pos):normalize():dotproduct(device().cam_dir) < 0.88 then
+				local projection = vector():project(fire_dir, device().cam_dir)
+				local length = (0.94 - vector():set(pos):sub(device().cam_pos):normalize():dotproduct(device().cam_dir)) / projection:magnitude()
+				pos:mad(projection, length)
+				pos:mad(fire_dir, 0.2)
+				
+				if settings.consider_silencer and isSilencedWeapon(wpn) and not (SYS_GetParam(0, hud_sec, "fire_bone_silencer") or SYS_GetParam(0, hud_sec, "fire_point_silencer")) then
+					pos:mad(fire_dir, 0.12)
+				end
+
+				if wpn_radii_fire_bone[wpn:section()] then
+					pos:mad(fire_dir, wpn_radii_fire_bone[wpn:section()])
+				end
+			end
+
+			saved_variables.pos = vector():set(pos)
+
+			-- Adjust position for correct ray cast after and animation leverage
+			local offset = vector():set(pos):distance_to(device().cam_pos) - 0.22
+			local ray_length = max(0.2, offset)
+			pos:mad(fire_dir, -ray_length)			
+
+			-- If not near wall, save offsets to use when tilt is engaged
+			if time_global() - saved_time > timeout then
+				local offset1 = vector():set(pos):sub(device().cam_pos)
+				local offset2 = vector():mad(pos, fire_dir, 0.5):sub(device().cam_pos)
+				local offset1_length = offset1:magnitude()
+				local offset2_length = offset2:magnitude()
+				local ui_offset1 = game.world2ui(pos, false, true)
+				local ui_offset2 = game.world2ui(vector():mad(pos, fire_dir, 0.5), false, true)
+
+				if not tilt_enabled then
+					saved_variables.offset1_length = offset1_length
+					saved_variables.offset2_length = offset2_length
+					saved_variables.ui_offset1 = ui_offset1
+					saved_variables.ui_offset2 = ui_offset2
+					saved_variables.ray_length = ray_length
+				end
+			end
+
+			-- disable feature when weapon is zoomed
+			if axr_main.weapon_is_zoomed then
+				reset_saved_vars()
+			end
+
+			-- If saved offsets, get original fire_point position before tilt
+			if saved_variables.offset1_length then
+				local new_pos = game.ui2world_offscreen(saved_variables.ui_offset1)
+				local new_pos_dir = vector():set(new_pos):sub(device().cam_pos):normalize()
+				local pos = device().cam_pos:mad(new_pos_dir, saved_variables.offset1_length)
+
+				local new_pos2 = game.ui2world_offscreen(saved_variables.ui_offset2)
+				local new_pos2_dir = vector():set(new_pos2):sub(device().cam_pos):normalize()
+				local pos2 = device().cam_pos:mad(new_pos2_dir, saved_variables.offset2_length)
+				local fire_dir = vector():set(pos2):sub(pos):normalize()
+
+				-- Ray cast to wall
+				local ray_range = 100
+				local ray = dgr.geometry_ray({
+					ray_range = saved_variables.ray_length,
+					ignore_object = db.actor,
+					flags = 3
+				})
+				local ray_collision_result = ray:get(pos, fire_dir)
+				if ray_collision_result.success then
+					dist = ray_collision_result.distance
+					max_dist = ray.ray_range
+				else
+					dist = ray_range
+				end
+
+				if settings.use_fire_bone_debug then
+					gizmos.fireBoneSphere.visible = true
+					gizmos.fireBoneSphere.color = fcolor():set(0,1,0,1)
+					local scale_mat = matrix():identity():scale(0.01, 0.01, 0.01)
+					local pos_mat = matrix():translate(pos)
+					local mat = matrix():mul(pos_mat, scale_mat)
+					gizmos.fireBoneSphere.matrix = mat
+
+					gizmos.fireBoneSphereAdjusted.visible = true
+					gizmos.fireBoneSphereAdjusted.color = fcolor():set(1,0,0,1)
+					local scale_mat = matrix():identity():scale(0.01, 0.01, 0.01)
+					local pos_mat = matrix():translate(saved_variables.pos)
+					local mat = matrix():mul(pos_mat, scale_mat)
+					gizmos.fireBoneSphereAdjusted.matrix = mat
+
+					gizmos.fireBoneSphereReal.visible = true
+					gizmos.fireBoneSphereReal.color = fcolor():set(1,1,0,1)
+					local scale_mat = matrix():identity():scale(0.01, 0.01, 0.01)
+					local pos_mat = matrix():translate(saved_variables.bone_pos)
+					local mat = matrix():mul(pos_mat, scale_mat)
+					gizmos.fireBoneSphereReal.matrix = mat
+
+					gizmos.collisionLine.visible = true
+					gizmos.collisionLine.color = ray_collision_result.success and fcolor():set(1,0,0,1) or fcolor():set(0,1,0,1)
+					gizmos.collisionLine.point_a = pos
+					gizmos.collisionLine.point_b = ray_collision_result.position
+				end
+			else
+				if settings.use_fire_bone_debug then
+					gizmos.fireBoneSphere.visible = false
+					gizmos.fireBoneSphereAdjusted.visible = false
+					gizmos.fireBoneSphereReal.visible = false
+					gizmos.collisionLine.visible = false
+				end
+			end
+		end
 
 		-- Soft reset if distance is more than max_dist
 		if dist > max_dist then
@@ -993,6 +1206,8 @@ end
 
 function reset_settings()
 	load_settings()
+
+	toggleDebugMode()
 
 	if settings.enable_manual_tilt then
 		RegisterScriptCallback("on_key_press", on_key_press)

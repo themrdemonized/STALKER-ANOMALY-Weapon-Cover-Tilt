@@ -3,14 +3,23 @@
 <string_table>
 	
 	<string id="ui_mcm_weapon_cover_tilt_title">
-		<text>Подъем оружия</text>
+		<text>Weapon Cover Tilt</text>
 	</string>
 	<string id="ui_mcm_menu_weapon_cover_tilt">
-		<text>Подъем оружия</text>
+		<text>Weapon Cover Tilt</text>
 	</string>
 
 	<string id="ui_mcm_weapon_cover_tilt_enabled">
 		<text>Включить</text>
+	</string>
+	<string id="ui_mcm_weapon_cover_tilt_use_fire_bone">
+		<text>Использовать размеры HUD модели</text>
+	</string>
+	<string id="ui_mcm_weapon_cover_tilt_use_fire_bone_desc">
+		<text>Когда эта опция включена, реальные размеры модели HUD будут определять, когда оружие будет наклонено. WCT будет выполнять рейкаст от кости fire_bone и ее смещения fire_point в направлении стрельбы. НЕОБХОДИМЫ MODDED EXES >= 2025.04.22. Метод по умолчанию будет использоваться, если новый метод недоступен</text>
+	</string>
+	<string id="ui_mcm_weapon_cover_tilt_use_fire_bone_debug">
+		<text>Использовать размеры HUD модели дебаг</text>
 	</string>
 	<string id="ui_mcm_weapon_cover_tilt_animation_speed">
 		<text>Инерция анимации</text>
