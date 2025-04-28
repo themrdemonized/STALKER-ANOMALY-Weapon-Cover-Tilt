@@ -1038,6 +1038,9 @@ function actor_on_update(binder, delta)
 				end
 			end
 
+			-- Slightly move back for some tolerance
+			pos:mad(fire_dir, -0.05)
+
 			saved_variables.pos = vector():set(pos)
 
 			-- Adjust position for correct ray cast after and animation leverage
@@ -1054,7 +1057,8 @@ function actor_on_update(binder, delta)
 				local ui_offset1 = game.world2ui(pos, false, true)
 				local ui_offset2 = game.world2ui(vector():mad(pos, fire_dir, 0.5), false, true)
 
-				if not tilt_enabled then
+				-- Save parameters when not in tilt and idling
+				if not tilt_enabled and state == 0 then
 					saved_variables.offset1_length = offset1_length
 					saved_variables.offset2_length = offset2_length
 					saved_variables.ui_offset1 = ui_offset1
