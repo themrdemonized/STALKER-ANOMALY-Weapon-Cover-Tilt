@@ -973,7 +973,7 @@ function actor_on_update(binder, delta)
 		end
 
 		if settings.use_fire_bone and MODDED_EXES_VERSION >= 20250422 then
-			local timeout = 1500
+			local timeout = 100
 
 			-- Get fire point bone position where barrel end resides
 			local fire_bone = SYS_GetParam(0, hud_sec, "fire_bone", "wpn_body")
@@ -1087,9 +1087,10 @@ function actor_on_update(binder, delta)
 				local ray_range = 100
 				local ray = dgr.geometry_ray({
 					ray_range = saved_variables.ray_length,
-					ignore_object = db.actor,
 					flags = 3
 				})
+				ray.ray:set_ignore_object(wpn)
+				ray.ray:set_ignore_object(db.actor)
 				local ray_collision_result = ray:get(pos, fire_dir)
 				if ray_collision_result.success then
 					dist = ray_collision_result.distance
